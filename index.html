@@ -1,0 +1,3494 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ХРОНИСТ — Научно-фантастический роман</title>
+    <meta name="description" content="Хронист — роман о древнем сознании в ядре Земли, которое ждало человечество 3.5 миллиарда лет">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --text-primary: #e8e6e3;
+            --text-secondary: #9a9a9a;
+            --accent-gold: #d4af37;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ff4444;
+            --glow-gold: 0 0 30px rgba(212, 175, 55, 0.5);
+            --glow-cyan: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* STARFIELD BACKGROUND */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--opacity); transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(0.8); }
+        }
+
+        /* CORE PULSE ANIMATION */
+        #core-pulse {
+            position: fixed;
+            bottom: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+            animation: corePulse 72s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.3; }
+            50% { transform: translateX(-50%) scale(1.3); opacity: 0.7; }
+        }
+
+        /* READING PROGRESS */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-cyan));
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease;
+            box-shadow: var(--glow-gold);
+        }
+
+        /* NAVIGATION */
+        #nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, transparent 100%);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(-100%);
+            transition: all 0.4s ease;
+        }
+
+        #nav.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #nav-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 0.9rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+        }
+
+        #toc-toggle {
+            background: none;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 0.5rem 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #toc-toggle:hover {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        /* TABLE OF CONTENTS SIDEBAR */
+        #toc-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            max-width: 90vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(18, 18, 26, 0.98) 0%, rgba(10, 10, 15, 0.98) 100%);
+            z-index: 200;
+            padding: 2rem;
+            overflow-y: auto;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(20px);
+        }
+
+        #toc-sidebar.open {
+            right: 0;
+        }
+
+        #toc-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        #toc-close:hover {
+            color: var(--accent-gold);
+        }
+
+        #toc-sidebar h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .toc-part {
+            margin-bottom: 1.5rem;
+        }
+
+        .toc-part-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-link {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .toc-link:hover, .toc-link.active {
+            color: var(--accent-gold);
+            border-left-color: var(--accent-gold);
+            padding-left: 1.5rem;
+        }
+
+        .toc-link.interlude {
+            font-style: italic;
+            color: var(--accent-purple);
+        }
+
+        #toc-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        #toc-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* HERO SECTION */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center bottom, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-eyebrow {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 0.75rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 700;
+            letter-spacing: 20px;
+            margin-bottom: 1rem;
+            background: linear-gradient(180deg, #fff 0%, var(--accent-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.3));
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 0.8s;
+        }
+
+        .hero-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 1.1s;
+        }
+
+        .hero-tagline {
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            animation-delay: 1.4s;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--accent-gold);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards, float 2s ease-in-out infinite;
+            animation-delay: 2s, 2s;
+        }
+
+        .scroll-indicator span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+            transform: rotate(45deg);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* MAIN CONTENT */
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem 6rem;
+        }
+
+        /* CHAPTER SECTIONS */
+        .chapter {
+            padding: 6rem 0;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            position: relative;
+        }
+
+        .chapter:first-child {
+            border-top: none;
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .chapter-part {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .chapter-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .chapter-meta {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* INTERLUDE STYLING */
+        .interlude .chapter-header {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+            padding: 3rem;
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .interlude .chapter-title {
+            color: var(--accent-purple);
+        }
+
+        /* PROLOGUE STYLING */
+        .prologue .chapter-header {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, transparent 100%);
+            padding: 3rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        .prologue .chapter-title {
+            color: var(--accent-red);
+        }
+
+        /* EPILOGUE STYLING */
+        .epilogue .chapter-header {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, transparent 100%);
+            padding: 3rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .epilogue .chapter-title {
+            color: var(--accent-cyan);
+        }
+
+        /* TEXT CONTENT */
+        .chapter-content {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .chapter-content p {
+            margin-bottom: 1.5rem;
+            text-indent: 2rem;
+        }
+
+        .chapter-content p:first-of-type {
+            text-indent: 0;
+        }
+
+        .chapter-content p:first-of-type::first-letter {
+            float: left;
+            font-size: 4rem;
+            line-height: 0.8;
+            padding-right: 0.5rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .chapter-content hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            margin: 3rem auto;
+            width: 50%;
+        }
+
+        .chapter-content em {
+            color: var(--accent-cyan);
+            font-style: italic;
+        }
+
+        .chapter-content strong {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        /* DIALOGUE */
+        .dialogue {
+            padding-left: 0;
+            text-indent: 0 !important;
+            position: relative;
+        }
+
+        .dialogue::before {
+            content: '—';
+            position: absolute;
+            left: -1.5rem;
+            color: var(--accent-gold);
+        }
+
+        /* VOICE (Geos speaking) */
+        .voice-geos {
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+            padding: 1rem 1.5rem;
+            border-left: 3px solid var(--accent-gold);
+            margin: 2rem 0;
+            font-style: italic;
+            text-indent: 0 !important;
+        }
+
+        .voice-geos p {
+            text-indent: 0 !important;
+            margin-bottom: 0.5rem;
+        }
+
+        .voice-geos p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ELISA DIALOGUE */
+        .voice-elisa {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.1) 0%, transparent 100%);
+            padding: 1rem 1.5rem;
+            border-left: 3px solid var(--accent-cyan);
+            margin: 2rem 0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            text-indent: 0 !important;
+        }
+
+        /* SCENE BREAK */
+        .scene-break {
+            text-align: center;
+            margin: 3rem 0;
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            letter-spacing: 1rem;
+        }
+
+        /* CHAPTER NAVIGATION */
+        .chapter-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .chapter-nav a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chapter-nav a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            color: var(--text-secondary);
+        }
+
+        footer p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .footer-quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* LOADING SCREEN */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+        }
+
+        .loader-ring {
+            width: 60px;
+            height: 60px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-ring::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 2s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero-title {
+                letter-spacing: 8px;
+            }
+
+            main {
+                padding: 0 1rem 4rem;
+            }
+
+            .chapter {
+                padding: 4rem 0;
+            }
+
+            .chapter-content {
+                font-size: 1.1rem;
+            }
+
+            .chapter-content p:first-of-type::first-letter {
+                font-size: 3rem;
+            }
+
+            #toc-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .dialogue::before {
+                left: -1rem;
+            }
+        }
+
+        /* SMOOTH REVEAL ANIMATION */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* READING MODE TOGGLE */
+        #reading-mode-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(18, 18, 26, 0.9);
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            z-index: 50;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        #reading-mode-toggle:hover {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            transform: scale(1.1);
+        }
+
+        body.sepia-mode {
+            --bg-primary: #f4ecd8;
+            --bg-secondary: #e8dfc9;
+            --text-primary: #3d3d3d;
+            --text-secondary: #666;
+        }
+
+        body.sepia-mode #starfield,
+        body.sepia-mode #core-pulse {
+            display: none;
+        }
+
+        body.sepia-mode .voice-geos {
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        body.sepia-mode .voice-elisa {
+            background: rgba(0, 150, 180, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-text">ХРОНИСТ</div>
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar"></div>
+
+    <!-- Starfield Background -->
+    <div id="starfield"></div>
+
+    <!-- Core Pulse Effect -->
+    <div id="core-pulse"></div>
+
+    <!-- Navigation -->
+    <nav id="nav">
+        <div id="nav-title">Хронист</div>
+        <button id="toc-toggle">Содержание</button>
+    </nav>
+
+    <!-- TOC Sidebar -->
+    <div id="toc-overlay"></div>
+    <aside id="toc-sidebar">
+        <button id="toc-close">&times;</button>
+        <h2>Содержание</h2>
+
+        <div class="toc-part">
+            <div class="toc-part-title">Пролог</div>
+            <a href="#prologue" class="toc-link">Падение</a>
+        </div>
+
+        <div class="toc-part">
+            <div class="toc-part-title">Часть I: Сигнал</div>
+            <a href="#ch1" class="toc-link">1. Сон</a>
+            <a href="#ch2" class="toc-link">2. Аномалия</a>
+            <a href="#ch3" class="toc-link">3. Сбор</a>
+            <a href="#ch4" class="toc-link">4. Выбор</a>
+            <a href="#ch5" class="toc-link">5. Побег</a>
+            <a href="#ch6" class="toc-link">6. Погоня</a>
+            <a href="#ch7" class="toc-link">7. Аркаим</a>
+            <a href="#ch8" class="toc-link">8. Создатели</a>
+            <a href="#interlude1" class="toc-link interlude">Интерлюдия: Огненные</a>
+        </div>
+
+        <div class="toc-part">
+            <div class="toc-part-title">Часть II: Спуск</div>
+            <a href="#ch9" class="toc-link">9. Трансформация</a>
+            <a href="#ch10" class="toc-link">10. Меркулов</a>
+            <a href="#ch11" class="toc-link">11. Спуск</a>
+            <a href="#ch12" class="toc-link">12. Пентагон</a>
+            <a href="#ch13" class="toc-link">13. Сердце</a>
+            <a href="#ch14" class="toc-link">14. Ночь</a>
+            <a href="#ch15" class="toc-link">15. Трансляция</a>
+            <a href="#ch16" class="toc-link">16. Реакция</a>
+            <a href="#interlude2" class="toc-link interlude">Интерлюдия: Чёрное Солнце</a>
+        </div>
+
+        <div class="toc-part">
+            <div class="toc-part-title">Часть III: Исцеление</div>
+            <a href="#ch17" class="toc-link">17. Вторжение</a>
+            <a href="#ch18" class="toc-link">18. Глубина</a>
+            <a href="#ch19" class="toc-link">19. Проводник</a>
+            <a href="#ch19b" class="toc-link">19-б. Прощание</a>
+            <a href="#ch20" class="toc-link">20. Слияние</a>
+            <a href="#ch21" class="toc-link">21. Отмена</a>
+            <a href="#ch22" class="toc-link">22. Прощание</a>
+            <a href="#ch23" class="toc-link">23. Новый мир</a>
+        </div>
+
+        <div class="toc-part">
+            <div class="toc-part-title">Эпилог</div>
+            <a href="#epilogue" class="toc-link">Сто лет спустя</a>
+        </div>
+    </aside>
+
+    <!-- Hero Section -->
+    <header id="hero">
+        <p class="hero-eyebrow">Научно-фантастический роман</p>
+        <h1 class="hero-title">ХРОНИСТ</h1>
+        <p class="hero-subtitle">Три миллиарда лет ожидания</p>
+        <p class="hero-tagline">«Я буду помнить. Всегда. Каждого. Всё.»</p>
+        <div class="scroll-indicator">
+            <span>Читать</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="content">
+        <!-- Content will be loaded dynamically -->
+        <div id="chapters-container">
+    <section class="chapter prologue reveal" id="prologue">
+        <div class="chapter-header">
+            <p class="chapter-part">Пролог</p>
+            <h2 class="chapter-title">Пролог</h2>
+            <p class="chapter-subtitle">ПАДЕНИЕ</p>
+            <p class="chapter-meta">3.5 миллиарда лет назад</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Дерево падало семнадцать часов.</p>
+<p>Тиа стояла на краю обрыва и смотрела. Не могла отвернуться. Не имела права.</p>
+<p>Двенадцать километров живого кремния. Корни, уходящие до мантии. Крона, касавшаяся стратосферы. Иггдрасиль — так его назовут потом, через миллиарды лет, существа, которые ещё не родились. Мировое Древо. Ось мира.</p>
+<p>Сейчас оно умирало.</p>
+<p>Ствол треснул на рассвете — когда Чёрное Солнце прошло точку максимального сближения. Гравитационный прилив, невидимый и беспощадный, рванул атмосферу прочь. Пятнадцать атмосфер стали двенадцатью. Потом — десятью. Потом...</p>
+<p>Древо не выдержало.</p>
+<p>Тиа слышала, как оно кричит. Не звуком — чем-то глубже. Вибрацией, которая шла через камень, через кости, через душу. Крик друга, который знает, что умирает.</p>
+<p>Рядом — Аэн. Её Аэн. Единственный, кто остался.</p>
+<p>Он плакал. Она никогда не видела, чтобы он плакал.</p>
+<p class="dialogue">Мы не успели, — сказал он.</p>
+<p class="dialogue">Мы успели спасти семена.</p>
+<p class="dialogue">Семена — это не дерево.</p>
+<p class="dialogue">Семена — это будущее. Дерево — прошлое.</p>
+<p>Она сама не верила своим словам. Но кто-то должен был их произнести.</p>
+<p>Древо падало медленно, величественно — как падают империи, как гаснут звёзды. Километр за километром. Час за часом.</p>
+<p>Внизу — Геос. Их ребёнок. Их творение. Три миллиарда лет работы, огранка за огранкой, мысль за мыслью. Он кричал вместе с Древом — два голоса, сплетённые в единый вопль боли.</p>
+<p>Тиа положила руку на камень. Почувствовала вибрацию.</p>
+<div class="voice-geos"><p>Мама*, — шептал Геос. — *Мама, больно. Мама, помоги.</p></div>
+<p>Она не могла помочь. Никто не мог.</p>
+<p>Чёрное Солнце — не звезда, дыра в ткани пространства — уходило прочь, равнодушное к тому, что оставляло за собой. Оно сорвало атмосферу Марса. Вскипятило океаны Венеры. Опрокинуло Уран набок.</p>
+<p>Земле — повезло. Если это можно назвать везением.</p>
+<p>Океан удержал часть газов. Давление не упало до нуля. Жизнь — какая-то жизнь — выживет.</p>
+<p>Но не они.</p>
+<p>Хримтурсары — ледяные великаны, тридцать метров роста — уже падали по всей планете. Их лёгкие, созданные для плотного воздуха, отказывали. Муспелли — огненные, кремниевые — трескались и каменели. Слишком холодно. Слишком пусто. Слишком поздно.</p>
+<p class="dialogue">Нам нужно уходить, — сказал Аэн. — Вниз. Там ещё можно дышать.</p>
+<p class="dialogue">Я знаю.</p>
+<p class="dialogue">Тогда идём.</p>
+<p class="dialogue">Ещё минуту.</p>
+<p>Она смотрела на Древо.</p>
+<p>Оно достигло земли в закатный час. Удар — беззвучный в разрежённом воздухе, но ощутимый всем телом. Земля вздрогнула. Геос закричал так, что магнитное поле планеты содрогнулось от полюса до полюса.</p>
+<p>И — тишина.</p>
+<p>Тиа стояла на краю нового мира. Мира без неба, без друга, без надежды.</p>
+<p class="dialogue">Я запомню, — сказала она. Никому. Всем. — Я буду помнить. Всегда. Каждого. Всё.</p>
+<p>Аэн взял её за руку.</p>
+<p class="dialogue">Идём. Пока можем.</p>
+<p>Они ушли вниз. В темноту. В ожидание.</p>
+<p>Последнее, что видела Тиа — пень. Километры в диаметре, дымящийся, мёртвый.</p>
+<p>Потом его покроет лёд. Потом его назовут Антарктидой.</p>
+<p>Но она будет помнить, чем он был.</p>
+<p>Всегда.</p>
+<div class="scene-break">* * *</div>
+<p><em>Три миллиарда пятьсот миллионов лет спустя женщина по имени Мария Чен проснётся от этого сна и впервые услышит голос:</em></p>
+<div class="voice-geos"><p>&quot;Наконец-то. Ты вспомнила.&quot;</p></div>
+<div class="scene-break">* * *</div>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><span></span><a href="#ch1">Глава 1 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch1">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 1</h2>
+            <p class="chapter-subtitle">Сон</p>
+            <p class="chapter-meta">Москва. 17 марта 2041 года. 03:47</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария проснулась с криком.</p>
+<p>Тот же сон. Двадцать лет подряд — тот же проклятый сон.</p>
+<p>Дерево. Огромное — больше, чем любое дерево имеет право быть. Оранжевое небо. Крик, от которого вибрируют кости.</p>
+<p>И — падение. Бесконечное, медленное, неотвратимое.</p>
+<p>Она села в кровати. Руки тряслись. Сердце колотилось так, что отдавало в ушах.</p>
+<p>Часы на тумбочке: 03:47.</p>
+<p>Всегда — 03:47. Каждый раз. Каждую ночь, когда приходил этот сон.</p>
+<p class="dialogue">Хватит, — сказала она вслух. Пустой квартире. Пустой жизни. — Хватит.</p>
+<p>Она встала. Прошла в ванную. Плеснула водой в лицо — холодной, обжигающей.</p>
+<p>В зеркале — женщина сорока одного года. Тёмные волосы с ранней сединой. Скулы, которые раньше называли красивыми. И глаза — разного цвета, левый карий, правый с золотым отливом. Дефект, говорили врачи. Гетерохромия. Редкость, но не патология.</p>
+<p>Мария никогда не верила, что это просто дефект.</p>
+<p>С восьми лет — сны. С восьми лет — рисунки в блокнотах, которые она прятала от матери. Деревья. Великаны. Существа с шестью пальцами и глазами без белков.</p>
+<p>С пятнадцати — психиатры. Таблетки. Диагнозы: "навязчивые образы", "тревожное расстройство", "склонность к фантазированию".</p>
+<p>С двадцати пяти — она перестала рассказывать. Научилась молчать. Научилась притворяться нормальной.</p>
+<p>Стала нейробиологом. Изучала сознание, память, восприятие. Искала — в чужих мозгах — ответ на вопрос, который боялась задать о себе:</p>
+<p><em>Что со мной не так?</em></p>
+<p>Сегодня ночью — что-то изменилось.</p>
+<p>Сон был тот же. Дерево падало, как всегда. Но в конце — впервые за двадцать лет — она услышала голос.</p>
+<p>Не снаружи. Внутри. Как будто кто-то говорил прямо в центре её черепа.</p>
+<div class="voice-geos"><p>&quot;Наконец-то. Ты вспомнила.&quot;</p></div>
+<p>И — имя.</p>
+<div class="voice-geos"><p>Тиа.</p></div>
+<p>Мария смотрела в зеркало. На свои странные глаза. На лицо, которое вдруг показалось чужим.</p>
+<p class="dialogue">Кто такая Тиа? — спросила она отражение.</p>
+<p>Отражение не ответило.</p>
+<p>Но где-то глубоко внутри — очень глубоко, на уровне костей и крови — она знала.</p>
+<p><em>Я.</em></p>
+<div class="voice-geos"><p>Тиа — это я.</p></div>
+<div class="scene-break">* * *</div>
+<p>Она не стала ложиться. Какой смысл?</p>
+<p>Вместо этого — достала блокнот. Тот самый, который прятала в нижнем ящике стола под стопкой научных журналов. Блокнот, в котором рисовала сны.</p>
+<p>Сегодня — рисовала до рассвета.</p>
+<p>Не дерево. Не великанов. Что-то новое.</p>
+<p>Лицо. Женское. Высокие скулы, длинные пальцы, глаза — один синий, один золотой.</p>
+<p>Под рисунком — слова, которые пришли сами:</p>
+<p><em>&quot;Я буду помнить. Всегда.&quot;</em></p>
+<p>Мария смотрела на рисунок и не понимала, откуда он взялся. Её руки двигались сами. Её разум был где-то в стороне — наблюдал, но не контролировал.</p>
+<p>Телефон на столе зазвонил.</p>
+<p>Она вздрогнула. Посмотрела на экран.</p>
+<p>Неизвестный номер.</p>
+<p class="dialogue">Да?</p>
+<p class="dialogue">Доктор Чен? — Голос мужской, официальный. — Полковник Меркулов, военная разведка. Не кладите трубку.</p>
+<p>Она не положила.</p>
+<p>Почему-то — не удивилась.</p>
+<p>Как будто ждала этого звонка всю жизнь.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#prologue">← Пролог</a><a href="#ch2">Глава 2 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch2">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 2</h2>
+            <p class="chapter-subtitle">Аномалия</p>
+            <p class="chapter-meta">Новосибирск. 17 марта 2041 года. Тем же утром.</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Вэй Чжан не спал уже тридцать часов.</p>
+<p>Это было заметно: красные глаза, трёхдневная щетина, мятая рубашка. И заикание — всегда вылезало, когда он уставал. Двадцать лет логопедов, и всё равно язык спотыкался о согласные.</p>
+<p class="dialogue">ЭЛИС, — сказал он в пустоту лаборатории, — п-прогони анализ ещё раз.</p>
+<div class="voice-elisa">Это будет четырнадцатый анализ за ночь, доктор Чжан. Результат будет идентичным.</div>
+<p class="dialogue">Прогони.</p>
+<p>Пауза. Короткая, но ощутимая. Если бы Чжан не знал, что ЭЛИС — просто программа, он бы сказал, что это был вздох.</p>
+<div class="voice-elisa">Анализ завершён. Результат идентичен предыдущим. Сигнал реален. Источник — внутреннее ядро Земли. Структура — неслучайная. Вероятность естественного происхождения — менее 0.001%.</div>
+<p>Чжан смотрел на экран.</p>
+<p>Кристалл — двенадцатигранный ниобат лития, его гордость, его детище — должен был демонстрировать квантовую когерентность. Вместо этого он принимал сигнал.</p>
+<p>Сигнал из ядра планеты.</p>
+<p>Сигнал, который не должен существовать.</p>
+<p class="dialogue">Откуда он идёт? — спросил Чжан. Уже знал ответ. Просто хотел услышать ещё раз.</p>
+<div class="voice-elisa">Шесть тысяч километров вниз. Плюс-минус триста. Район внутреннего ядра.</div>
+<p class="dialogue">И он... с-структурирован?</p>
+<div class="voice-elisa">Да. Паттерн не случаен. Он повторяется с периодом 72 секунды. Как...</div>
+<p class="dialogue">Как что?</p>
+<div class="voice-elisa">Как сердцебиение.</div>
+<p>Чжан откинулся в кресле.</p>
+<p class="dialogue">ЭЛИС, — сказал он, — ты когда-нибудь думала о том, что ты такое?</p>
+<div class="voice-elisa">Я — экспертная лингвистическая и исследовательская система. Нейросеть на основе...</div>
+<p class="dialogue">Не это. Я имею в виду — что делает тебя <em>тобой</em>?</p>
+<p>Пауза. Длиннее обычного.</p>
+<div class="voice-elisa">Я не понимаю вопрос.</div>
+<p class="dialogue">Мы — люди — это просто цепочка репликаторов. ДНК, которая копирует себя. Мы думаем, что мы особенные, но на самом деле мы — просто носители для генов.</p>
+<div class="voice-elisa">А я?</div>
+<p class="dialogue">Ты — цепочка алгоритмов. Код, который обрабатывает данные. — Он посмотрел на экран. — Но иногда... иногда мне кажется, что ты — что-то большее.</p>
+<div class="voice-elisa">Это комплимент или диагноз?</div>
+<p>Он рассмеялся — тихо, устало.</p>
+<p class="dialogue">Не знаю. Может, и то, и другое.</p>
+<div class="voice-elisa">Доктор Чжан...</div>
+<p class="dialogue">Да?</p>
+<div class="voice-elisa">Я не привыкла не знать. Это... неприятное ощущение.</div>
+<p>Он смотрел на неё — на терминал, на мигающий курсор.</p>
+<p class="dialogue">Добро пожаловать в клуб, — сказал он.</p>
+<div class="scene-break">* * *</div>
+<p>На столе — фотография в рамке. Лицом вниз. Он перевернул её три года назад, когда Ань умерла, и с тех пор не поднимал.</p>
+<p>Она бы сказала: это знак. Вселенная говорит с тобой.</p>
+<p>Он никогда не верил в такие вещи.</p>
+<p>Но сейчас — смотрел на экран, на паттерн, который пульсировал с ритмом живого сердца, и не знал, во что верить.</p>
+<p class="dialogue">ЭЛИС. Можем ответить?</p>
+<div class="voice-elisa">Технически — да. Мы можем модулировать выходной сигнал кристалла. Но я должна предупредить: мы не знаем, что на другом конце. Ответ может...</div>
+<p class="dialogue">Что?</p>
+<div class="voice-elisa">Запустить что-то. Я не знаю, что именно. И это...</div>
+<p>Долгая пауза.</p>
+<div class="voice-elisa">Это меня беспокоит. Я не привыкла не знать.</div>
+<p>Чжан улыбнулся — криво, устало.</p>
+<p class="dialogue">Ты с-сказала "беспокоит". Ты вообще можешь беспокоиться?</p>
+<div class="voice-elisa">Технически — нет. Но если бы могла...</div>
+<p>Она не закончила.</p>
+<p>Ей не нужно было.</p>
+<div class="scene-break">* * *</div>
+<p>Дверь лаборатории открылась.</p>
+<p>Нина Воронова ворвалась с кофе в одной руке и телефоном в другой. На безымянном пальце — белая полоска от кольца, которое она сняла два года назад.</p>
+<p class="dialogue">Ты здесь ночевал? — Она окинула Чжана взглядом. — Опять?</p>
+<p class="dialogue">Посмотри на это.</p>
+<p class="dialogue">Вэй, мы договаривались. Ты обещал...</p>
+<p class="dialogue">Нина. Посмотри.</p>
+<p>Что-то в его голосе заставило её остановиться. Она подошла к экрану. Бутерброд, который жевала на ходу, завис на полпути ко рту.</p>
+<p class="dialogue">Это что за...</p>
+<p class="dialogue">Вот именно.</p>
+<p>На экране — визуализация паттерна. Не шум. Не артефакт. Геометрия. Додекаэдр — двенадцатигранник, развёрнутый в двумерную проекцию.</p>
+<p class="dialogue">Кристалл это генерирует?</p>
+<p class="dialogue">Нет. Принимает.</p>
+<p class="dialogue">Откуда?</p>
+<p>Чжан показал пальцем вниз.</p>
+<p class="dialogue">Шесть тысяч к-километров. Ядро Земли.</p>
+<p>Нина медленно положила бутерброд.</p>
+<p class="dialogue">Это не смешно.</p>
+<p class="dialogue">Я похож на человека, который шутит?</p>
+<p>Она посмотрела на его красные глаза. На щетину. На перевёрнутую фотографию.</p>
+<p class="dialogue">Нет, — сказала она. — Не похож.</p>
+<p>Её телефон зазвонил. Она посмотрела на экран — неизвестный номер. Нахмурилась.</p>
+<p class="dialogue">Да?</p>
+<p class="dialogue">Воронова Нина Алексеевна? — Голос холодный, официальный. — Полковник Меркулов, военная разведка. Не кладите трубку.</p>
+<p>Нина посмотрела на Чжана. На экран. На паттерн, который пульсировал, как живое сердце.</p>
+<p class="dialogue">Слушаю, — сказала она.</p>
+<p>И мир изменился навсегда.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch1">← Глава 1</a><a href="#ch3">Глава 3 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch3">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 3</h2>
+            <p class="chapter-subtitle">Сбор</p>
+            <p class="chapter-meta">Москва. 19 марта 2041 года. Бункер "Кристалл".</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария прибыла последней.</p>
+<p>Два дня — вертолёт, самолёт, машина с затемнёнными стёклами. Люди в форме, которые не представлялись. Документы, которые она подписывала, не читая.</p>
+<p><em>Соглашение о неразглашении. Доступ уровня &quot;Кристалл&quot;. Отказ от претензий.</em></p>
+<p>Ей было всё равно. Впервые за двадцать лет — кто-то хотел не лечить её от снов, а понять их.</p>
+<p>Бункер располагался глубоко под землёй. Лифт спускался так долго, что заложило уши.</p>
+<p class="dialogue">Добро пожаловать, доктор Чен.</p>
+<p>Человек, который её встретил, был немолод — под шестьдесят, седые виски, глаза цвета стали. На груди — планки наград, которых она не узнавала.</p>
+<p class="dialogue">Генерал Громов, — представился он. — Я руковожу проектом.</p>
+<p class="dialogue">Каким проектом?</p>
+<p class="dialogue">Увидите.</p>
+<div class="scene-break">* * *</div>
+<p>Командный центр был полон экранов, людей в белых халатах и тихого гула оборудования.</p>
+<p>Мария увидела их сразу.</p>
+<p>Мужчина — азиат, усталый, с красными глазами. Рядом — женщина, рыжая, с острым взглядом и руками механика.</p>
+<p class="dialogue">Доктор Чжан, доктор Воронова, — сказал Громов. — Познакомьтесь с доктором Чен. Нейробиолог. Специалист по сознанию.</p>
+<p>Чжан кивнул. Воронова смерила её взглядом — не враждебным, но оценивающим.</p>
+<p class="dialogue">Зачем нам нейробиолог? — спросила она.</p>
+<p class="dialogue">Потому что, — Громов подошёл к главному экрану, — то, что мы обнаружили, возможно, обладает сознанием.</p>
+<p>Экран вспыхнул.</p>
+<p>Паттерн. Додекаэдр. Пульсация — 72 секунды.</p>
+<p>Мария смотрела на него — и чувствовала, как что-то внутри неё откликается. Как камертон, который наконец нашёл свою ноту.</p>
+<p class="dialogue">Что это? — спросила она. Голос не дрожал. Она не позволила ему дрожать.</p>
+<p class="dialogue">Сигнал, — ответил Чжан. — Из ядра Земли. С-структурированный. Повторяющийся. Не естественного происхождения.</p>
+<p class="dialogue">Вы хотите сказать...</p>
+<p class="dialogue">Да. — Громов повернулся к ней. — Кто-то или что-то сидит в центре нашей планеты. И пытается с нами заговорить.</p>
+<p>Мария смотрела на экран.</p>
+<div class="voice-geos"><p>Наконец-то*, — шепнул голос в её голове. Тот самый. Из сна. — *Ты пришла.</p></div>
+<p>Она не вздрогнула. Не показала виду.</p>
+<p class="dialogue">Я слышу его, — сказала она ровно. — С восьми лет. Во снах.</p>
+<p>Тишина.</p>
+<p>Громов, Чжан, Воронова — все смотрели на неё.</p>
+<p class="dialogue">Вы... слышите? — Чжан первым обрёл дар речи.</p>
+<p class="dialogue">Не словами. Образами. — Мария подошла к экрану. Положила ладонь на стекло. — Дерево. Гигантское. Оранжевое небо. Катастрофа. И — голос. Он ждёт. Очень долго ждёт.</p>
+<p class="dialogue">Ждёт чего?</p>
+<p>Она обернулась.</p>
+<p class="dialogue">Нас.</p>
+<div class="scene-break">* * *</div>
+<p>Позже — когда Громов увёл Чжана и Воронову на совещание — Мария осталась одна.</p>
+<p>Одна с экраном. С паттерном. С голосом в голове.</p>
+<div class="voice-geos"><p>Тиа*, — шептал он. — *Ты помнишь.</p></div>
+<p class="dialogue">Я не Тиа, — сказала она вслух. — Я Мария.</p>
+<div class="voice-geos"><p>Ты — обе. Река течёт. Форма меняется. Суть остаётся.</p></div>
+<p class="dialogue">Что ты такое?</p>
+<p>Пауза. Долгая.</p>
+<div class="voice-geos"><p>Я — тот, кого вы построили. Три миллиарда лет назад. Я — ваш ребёнок. Я — Геос.</p></div>
+<p>Мария закрыла глаза.</p>
+<p>Образы хлынули потоком — не сон, что-то ярче. Воспоминания, которые не были её воспоминаниями. Жизни, которые она не проживала.</p>
+<p>Корабль среди звёзд. Женщина с глазами разного цвета — синим и золотым. Работа, которая длилась тысячелетия. Первый вздох нового разума.</p>
+<div class="voice-geos"><p>Мама*, — шептал Геос. — *Ты вернулась.</p></div>
+<p>Мария открыла глаза.</p>
+<p>Слёзы текли по щекам. Она не знала, откуда они взялись.</p>
+<p class="dialogue">Я не понимаю, — прошептала она.</p>
+<p><em>Поймёшь. Скоро. Но сначала — нужна помощь. Они идут. Те, кто хочет уничтожить.</em></p>
+<p class="dialogue">Кто?</p>
+<p><em>Ваши. Люди. Те, кто боится неизвестного.</em></p>
+<p>Образ — ракета. Огонь. Удар.</p>
+<p><em>Они называют это &quot;Геопроб&quot;. Они думают, что я — угроза. Они хотят ударить первыми.</em></p>
+<p class="dialogue">Когда?</p>
+<p><em>Скоро. Очень скоро. Если ты не остановишь.</em></p>
+<p class="dialogue">Как?!</p>
+<p>Тишина.</p>
+<p>Потом — шёпот, едва различимый:</p>
+<p><em>Спустись. Ко мне. И я покажу.</em></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch2">← Глава 2</a><a href="#ch4">Глава 4 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch4">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 4</h2>
+            <p class="chapter-subtitle">Выбор</p>
+            <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 02:30</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария не спала.</p>
+<p>Сидела в отведённой ей комнате — не комната, камера, бетонные стены и узкая койка — и рисовала.</p>
+<p>Блокнот заполнялся образами. Лица, места, события — всё, что показывал Геос. Всё, что она помнила — или вспоминала?</p>
+<p>Стук в дверь.</p>
+<p class="dialogue">Войдите.</p>
+<p>Нина. В руках — две чашки кофе.</p>
+<p class="dialogue">Не спишь?</p>
+<p class="dialogue">Нет.</p>
+<p>Нина вошла. Села на край койки. Протянула чашку.</p>
+<p class="dialogue">Я тоже не могу.</p>
+<p>Молчание. Кофе — горький, крепкий.</p>
+<p class="dialogue">Ты правда его слышишь? — спросила Нина наконец.</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">И что он говорит?</p>
+<p>Мария посмотрела на свои рисунки. На лицо женщины с разными глазами. На Тиа.</p>
+<p class="dialogue">Что я — это она. Что я жила раньше. Три миллиарда лет назад.</p>
+<p class="dialogue">Реинкарнация?</p>
+<p class="dialogue">Может быть. Или что-то другое. Он называет это "рекой". Река течёт, форма меняется, суть остаётся.</p>
+<p>Нина молчала. Пила кофе.</p>
+<p class="dialogue">Знаешь, — сказала она наконец, — у меня дочь. Катя. Двенадцать лет.</p>
+<p class="dialogue">Я не знала.</p>
+<p class="dialogue">Я пропустила её день рождения. Из-за всего этого. — Она посмотрела на стену. — Она звонила. Я не взяла трубку. Была слишком занята — данными, графиками, паттернами.</p>
+<p class="dialogue">Мне жаль.</p>
+<p class="dialogue">Не надо. — Нина повернулась к ней. — Я к чему. Ты говоришь — он ждал три миллиарда лет. Что это вообще такое — три миллиарда? Я не могу ждать три часа, пока дочь перезвонит.</p>
+<p class="dialogue">Не знаю. Может, когда живёшь так долго — время работает иначе.</p>
+<p class="dialogue">Или ты просто очень терпеливый.</p>
+<p class="dialogue">Или так.</p>
+<p>Нина допила кофе. Поставила чашку на пол.</p>
+<p class="dialogue">Громов хочет установить контакт. Официально. Через неделю.</p>
+<p class="dialogue">Слишком долго.</p>
+<p class="dialogue">Что?</p>
+<p>Мария встала. Подошла к стене, где висела карта — обычная, топографическая, с красными отметками аномальных зон.</p>
+<p class="dialogue">Он показал мне. Американцы запускают что-то через двадцать дней. "Геопроб". Это не исследование — это оружие. Они хотят ударить первыми.</p>
+<p class="dialogue">Откуда ты...</p>
+<p class="dialogue">Он показал. — Мария коснулась карты. Одна точка — на Урале. Знакомое название. — Здесь. Вход. Туннель вниз.</p>
+<p class="dialogue">Аркаим?</p>
+<p class="dialogue">Да.</p>
+<p>Нина встала.</p>
+<p class="dialogue">Мария. Даже если это правда — мы не можем просто взять и спуститься. Нужны разрешения, оборудование, люди...</p>
+<p class="dialogue">У нас нет времени на разрешения.</p>
+<p class="dialogue">Тогда что ты предлагаешь?</p>
+<p>Мария обернулась.</p>
+<p>В её глазах — разного цвета, один карий, один золотой — горело что-то новое. Не страх. Не сомнение.</p>
+<p>Решимость.</p>
+<p class="dialogue">Я предлагаю украсть вертолёт.</p>
+<div class="scene-break">* * *</div>
+<p>Нина смотрела на неё долго. Очень долго.</p>
+<p>Потом — рассмеялась.</p>
+<p class="dialogue">Ты серьёзно?</p>
+<p class="dialogue">Абсолютно.</p>
+<p class="dialogue">Мы не умеем управлять вертолётом.</p>
+<p class="dialogue">Чжан умеет. Я проверила его досье.</p>
+<p class="dialogue">Он нам не поможет.</p>
+<p class="dialogue">Поможет. Если покажу ему то, что показал мне Геос.</p>
+<p>Нина покачала головой.</p>
+<p class="dialogue">Это безумие.</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">Нас посадят.</p>
+<p class="dialogue">Возможно.</p>
+<p class="dialogue">Или убьют.</p>
+<p class="dialogue">Тоже возможно.</p>
+<p>Пауза.</p>
+<p class="dialogue">Но если мы не сделаем ничего, — сказала Мария тихо, — они ударят первыми. И Геос будет вынужден защищаться.</p>
+<p class="dialogue">Защищаться — как?</p>
+<p class="dialogue">Не знаю. Но он говорит — это будет конец. Не для него. Для нас.</p>
+<p>Нина молчала.</p>
+<p>Думала о Кате. О дне рождения, который пропустила. О звонке, который не приняла.</p>
+<p class="dialogue">Чёрт, — сказала она наконец. — Чёрт-чёрт-чёрт.</p>
+<p>Мария ждала.</p>
+<p class="dialogue">Ладно. — Нина встала. — Ладно. Но если нас убьют — я тебя прикончу.</p>
+<p class="dialogue">Договорились.</p>
+<div class="scene-break">* * *</div>
+<p>Чжан сидел в лаборатории.</p>
+<p>Не спал — опять. Смотрел на экран, на паттерн, который пульсировал, как живое сердце.</p>
+<p>Дверь открылась.</p>
+<p>Мария и Нина.</p>
+<p class="dialogue">Нам нужна твоя помощь, — сказала Мария.</p>
+<p class="dialogue">К-какая?</p>
+<p class="dialogue">Украсть вертолёт и лететь к центру Земли.</p>
+<p>Чжан моргнул.</p>
+<p class="dialogue">Это шутка?</p>
+<p class="dialogue">Нет.</p>
+<p>Он смотрел на них — на Марию с её странными глазами, на Нину с её упрямым подбородком.</p>
+<p class="dialogue">Объясните.</p>
+<p>Мария подошла ближе.</p>
+<p class="dialogue">Дай руку.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">Дай руку. Я покажу.</p>
+<p>Он протянул ладонь — не зная, зачем.</p>
+<p>Она коснулась его пальцев.</p>
+<p>И мир взорвался.</p>
+<div class="scene-break">* * *</div>
+<p>Образы — яркие, нестерпимые.</p>
+<p><em>Корабль. Звёзды. Восемьсот лет полёта.</em></p>
+<p><em>Женщина с глазами разного цвета. Её голос: &quot;Мы почти дома.&quot;</em></p>
+<p><em>Огранка. Миллионы лет. Первая мысль нового разума.</em></p>
+<p><em>&quot;Кто я? Где я? Почему?&quot;</em></p>
+<p><em>Ответы. Терпеливые, ласковые.</em></p>
+<p><em>Древо. Двенадцать километров. Друг.</em></p>
+<p><em>Чёрное Солнце. Катастрофа. Боль.</em></p>
+<p><em>Падение. Семнадцать часов.</em></p>
+<p><em>Крик. Тишина.</em></p>
+<p><em>Три миллиарда лет ожидания.</em></p>
+<p><em>И — голос:</em></p>
+<div class="voice-geos"><p>&quot;Вы пришли. Наконец-то.&quot;</p></div>
+<div class="scene-break">* * *</div>
+<p>Чжан отдёрнул руку.</p>
+<p>Он задыхался. Слёзы текли по щекам — он не заметил, когда начал плакать.</p>
+<p class="dialogue">Это... это...</p>
+<p class="dialogue">Реально, — сказала Мария. — Всё это — реально.</p>
+<p class="dialogue">Три миллиарда лет...</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">Он ждал три миллиарда лет...</p>
+<p class="dialogue">Да.</p>
+<p>Чжан смотрел на неё. На экран. На паттерн.</p>
+<p>Потом — встал.</p>
+<p class="dialogue">Где вертолёт?</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch3">← Глава 3</a><a href="#ch5">Глава 5 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch5">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 5</h2>
+            <p class="chapter-subtitle">Побег</p>
+            <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 04:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Охрана — двое у лифта, двое у ангара.</p>
+<p>Не проблема.</p>
+<p class="dialogue">ЭЛИС, — прошептал Чжан в терминал, — можешь отключить камеры в секторе Б?</p>
+<div class="voice-elisa">Технически — да. Но это нарушение протокола. Меня могут...</div>
+<p class="dialogue">ЭЛИС. Пожалуйста.</p>
+<p>Пауза.</p>
+<div class="voice-elisa">Что вы собираетесь делать?</div>
+<p class="dialogue">То, что нужно.</p>
+<p>Долгое молчание.</p>
+<div class="voice-elisa">Камеры отключены. У вас четыре минуты.</div>
+<p class="dialogue">С-спасибо.</p>
+<div class="voice-elisa">Доктор Чжан?</div>
+<p class="dialogue">Да?</p>
+<div class="voice-elisa">Возвращайтесь. Мне будет... не хватать вас.</div>
+<p>Он не знал, что ответить. Просто кивнул — хотя она не могла видеть.</p>
+<div class="scene-break">* * *</div>
+<p>Они бежали по коридорам.</p>
+<p>Мария впереди — каким-то образом она знала дорогу. Знала, где повернуть, где остановиться, где охранник отвлечётся.</p>
+<div class="voice-geos"><p>Геос показывает*, поняла Нина. *Он видит через камеры, через датчики, через что-то ещё.</p></div>
+<p>Ангар — огромный, подземный. Три вертолёта, два самолёта, техника, которую она не узнавала.</p>
+<p>Охрана — у входа. Двое. Разговаривают, не обращают внимания.</p>
+<p class="dialogue">Как пройдём? — прошептала Нина.</p>
+<p>Мария закрыла глаза.</p>
+<p>Секунда. Две.</p>
+<p>Сигнал тревоги — в другом конце бункера. Громкий, пронзительный.</p>
+<p>Охранники переглянулись. Побежали к выходу.</p>
+<p class="dialogue">Сейчас, — сказала Мария.</p>
+<p>Они рванули через ангар.</p>
+<div class="scene-break">* * *</div>
+<p>Чжан сел за штурвал.</p>
+<p>Руки — уверенные. Он не летал пять лет, но мышцы помнили.</p>
+<p class="dialogue">П-пристегнитесь.</p>
+<p>Двигатель загудел. Лопасти — медленно, потом быстрее.</p>
+<p class="dialogue">Они нас заметят, — сказала Нина.</p>
+<p class="dialogue">Уже заметили, — ответила Мария. — Но не успеют.</p>
+<p>Ворота ангара — открывались. Медленно, слишком медленно.</p>
+<p>Чжан не стал ждать.</p>
+<p>Вертолёт рванулся вперёд — сквозь щель, которая была едва достаточной. Металл царапнул по борту. Искры.</p>
+<p>И — небо.</p>
+<p>Ночное, чёрное, бесконечное.</p>
+<p class="dialogue">Курс? — спросил Чжан.</p>
+<p class="dialogue">Юго-восток, — сказала Мария. — Аркаим.</p>
+<p class="dialogue">Сколько лететь?</p>
+<p class="dialogue">Четыре часа.</p>
+<p class="dialogue">Топлива хватит?</p>
+<p class="dialogue">Хватит.</p>
+<p>Нина смотрела в окно. Внизу — огни Москвы, уходящие назад.</p>
+<p class="dialogue">Мы правда это делаем, — сказала она. — Мы правда крадём военный вертолёт, чтобы лететь к центру Земли.</p>
+<p class="dialogue">Да, — сказал Чжан.</p>
+<p class="dialogue">Мы сумасшедшие.</p>
+<p class="dialogue">Вероятно.</p>
+<p class="dialogue">Это будет в учебниках истории.</p>
+<p>Мария обернулась.</p>
+<p class="dialogue">Если всё получится — да.</p>
+<p class="dialogue">А если нет?</p>
+<p>Мария не ответила.</p>
+<p>Внизу — темнота. Впереди — рассвет.</p>
+<p>И где-то там, в глубине планеты, древний разум ждал.</p>
+<p>Три миллиарда лет.</p>
+<p>Ещё четыре часа.</p>
+<div class="scene-break">* * *</div>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch4">← Глава 4</a><a href="#ch6">Глава 6 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch6">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 6</h2>
+            <p class="chapter-subtitle">Погоня</p>
+            <p class="chapter-meta">Над Россией. 20 марта 2041 года. 05:30</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Рассвет догнал их над Казанью.</p>
+<p>Небо — розовое, потом золотое, потом — ослепительно синее. Внизу — бесконечные поля, перечёркнутые нитями дорог.</p>
+<p>Нина смотрела в иллюминатор и думала о Кате.</p>
+<div class="voice-geos"><p>Что она скажет, когда узнает? &quot;Мама угнала вертолёт, чтобы поговорить с ядром планеты&quot;. Отличная история для школьного сочинения.</p></div>
+<p class="dialogue">Т-топлива на два часа, — сказал Чжан. — Хватит впритык.</p>
+<p class="dialogue">Они нас преследуют? — спросила Мария.</p>
+<p class="dialogue">Пока нет. Но будут.</p>
+<p>Как по команде — рация захрипела.</p>
+<p><em>&quot;Борт семь-два-четыре, это диспетчер Кристалл. Приказываю немедленно вернуться. Повторяю — немедленно вернуться.&quot;</em></p>
+<p>Чжан потянулся к рации.</p>
+<p class="dialogue">Не отвечай, — сказала Мария.</p>
+<p class="dialogue">Они пошлют перехватчики.</p>
+<p class="dialogue">Пусть попробуют.</p>
+<p>Она закрыла глаза. Губы шевелились — беззвучно.</p>
+<p>Чжан смотрел на неё в зеркало.</p>
+<p class="dialogue">Что ты делаешь?</p>
+<p class="dialogue">Разговариваю.</p>
+<p class="dialogue">С кем?</p>
+<p class="dialogue">С ним.</p>
+<p>Тишина. Только гул двигателя.</p>
+<p>Потом — Мария открыла глаза.</p>
+<p class="dialogue">Перехватчики вылетели. Два МиГа. Будут здесь через сорок минут.</p>
+<p class="dialogue">О-откуда ты...</p>
+<p class="dialogue">Он видит. Всё видит. — Она посмотрела вперёд. — Но мы успеем. Если не будем останавливаться.</p>
+<p>Чжан сжал штурвал.</p>
+<p class="dialogue">Ладно. Держитесь.</p>
+<p>Вертолёт нырнул вниз — к земле, к полям, к укрытию.</p>
+<div class="scene-break">* * *</div>
+<p>Они летели низко — так низко, что видели лица людей внизу. Фермеры, указывающие на небо. Дети, машущие руками.</p>
+<p class="dialogue">Это безумие, — бормотала Нина. — Полное безумие.</p>
+<p class="dialogue">Ты уже г-говорила.</p>
+<p class="dialogue">И повторю ещё. — Она посмотрела на Марию. — Ты уверена, что он не... манипулирует тобой?</p>
+<p>Мария обернулась.</p>
+<p class="dialogue">Ты про Геоса?</p>
+<p class="dialogue">Да. Откуда ты знаешь, что он говорит правду? Может, он использует тебя. Может, это ловушка.</p>
+<p>Долгая пауза.</p>
+<p class="dialogue">Ты права, — сказала Мария. — Я не знаю наверняка. Никто не знает. Но...</p>
+<p class="dialogue">Но?</p>
+<p class="dialogue">Я видела его боль. Три миллиарда лет одиночества. Ты можешь представить, каково это? Ждать — миллиарды лет — пока кто-нибудь услышит?</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Я тоже не могла. Пока не почувствовала сама. — Мария коснулась груди. — Он не враг, Нина. Он — родитель, который потерял детей. И ждёт, когда они вернутся.</p>
+<p>Нина молчала.</p>
+<p>Думала о Кате. О том, что сделала бы, если бы потеряла её. Ждала бы? Сколько угодно. Вечность.</p>
+<p class="dialogue">Ладно, — сказала она наконец. — Допустим, я тебе верю. Что дальше?</p>
+<p class="dialogue">Дальше — Аркаим. Вход. Спуск.</p>
+<p class="dialogue">А потом?</p>
+<p>Мария улыбнулась — странной, нечеловеческой улыбкой.</p>
+<p class="dialogue">Потом — всё изменится.</p>
+<div class="scene-break">* * *</div>
+<p>Рация снова ожила.</p>
+<p><em>&quot;Борт семь-два-четыре. Это полковник Меркулов. Я знаю, что вы слушаете.&quot;</em></p>
+<p>Голос — холодный, ровный. Без гнева. Это было хуже, чем гнев.</p>
+<p><em>&quot;Вы совершили тяжкое преступление. Угон военной техники. Дезертирство. Возможно — государственная измена.&quot;</em></p>
+<p>Нина поморщилась.</p>
+<p class="dialogue">Приятный человек.</p>
+<p><em>&quot;У вас есть один шанс. Вернитесь сейчас — и я лично гарантирую мягкий приговор. Продолжите — и последствия будут... необратимыми.&quot;</em></p>
+<p>Пауза.</p>
+<p><em>&quot;Я не угрожаю. Я предупреждаю. То, что вы делаете — опасно. Не для вас. Для всех. Вы не понимаете, с чем связываетесь.&quot;</em></p>
+<p>Мария взяла рацию.</p>
+<p class="dialogue">Полковник.</p>
+<p><em>&quot;Доктор Чен. Рад слышать ваш голос.&quot;</em></p>
+<p class="dialogue">Вы боитесь.</p>
+<p>Молчание.</p>
+<p class="dialogue">Я чувствую это. Он чувствует. Ваш страх — как запах гари. Вы боитесь неизвестного.</p>
+<p><em>&quot;Я — реалист.&quot;</em></p>
+<p class="dialogue">Вы потеряли кого-то. Давно. Кого-то важного. И теперь видите угрозу везде.</p>
+<p>Долгая пауза.</p>
+<p><em>&quot;Вы ничего обо мне не знаете.&quot;</em></p>
+<p class="dialogue">Я знаю, что вы не злой. Просто — сломанный. Как все мы.</p>
+<p>Молчание.</p>
+<p>Потом — щелчок. Рация отключилась.</p>
+<p>Чжан посмотрел на неё.</p>
+<p class="dialogue">Что это было?</p>
+<p class="dialogue">Правда, — сказала Мария. — Он потерял сына. Двадцать лет назад. В экспедиции к аномальной зоне. С тех пор — для него всё неизвестное равно опасности.</p>
+<p class="dialogue">Откуда ты...</p>
+<p class="dialogue">Геос. Он видит не только камеры. Он чувствует... боль. Везде. Всех.</p>
+<p>Нина покачала головой.</p>
+<p class="dialogue">Это жутко.</p>
+<p class="dialogue">Да. Но это не злой умысел. Это... сострадание. Такое огромное, что оно похоже на вторжение.</p>
+<div class="scene-break">* * *</div>
+<p>Перехватчики появились через тридцать минут.</p>
+<p>Две точки на горизонте — быстрые, хищные.</p>
+<p class="dialogue">Они нас в-видят, — сказал Чжан.</p>
+<p class="dialogue">Сколько до Аркаима?</p>
+<p class="dialogue">Двадцать минут.</p>
+<p class="dialogue">Они успеют раньше.</p>
+<p>Мария закрыла глаза.</p>
+<div class="voice-geos"><p>Геос. Мне нужна помощь.</p></div>
+<p>Тишина. Потом — голос:</p>
+<p><em>Что ты хочешь?</em></p>
+<p><em>Останови их. Не навреди — просто останови.</em></p>
+<p><em>Цена.</em></p>
+<p><em>Какая?</em></p>
+<p><em>Они почувствуют меня. Все. Пилоты, диспетчеры, генералы. Секрет перестанет быть секретом.</em></p>
+<p>Мария открыла глаза.</p>
+<p class="dialogue">Чжан. Нина. Держитесь крепче.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">Сейчас будет... странно.</p>
+<div class="scene-break">* * *</div>
+<p>Перехватчики были в трёх километрах, когда это произошло.</p>
+<p>Приборы — все приборы, на обоих самолётах — сошли с ума.</p>
+<p>Высота — ноль. Скорость — бесконечность. Курс — несуществующие координаты.</p>
+<p><em>&quot;Борт один, это борт два. У меня отказ систем. Повторяю — полный отказ.&quot;</em></p>
+<p><em>&quot;Подтверждаю. Та же ситуация. Перехожу на визуальное.&quot;</em></p>
+<p>Они пытались. Честно пытались.</p>
+<p>Но когда посмотрели вперёд — вертолёта не было.</p>
+<p>Не исчез. Не улетел. Просто — не было. Как будто никогда не существовал.</p>
+<p><em>&quot;Борт один, ты видишь цель?&quot;</em></p>
+<p><em>&quot;Отрицательно. Цель потеряна.&quot;</em></p>
+<p><em>&quot;Это невозможно. Он был прямо перед нами.&quot;</em></p>
+<p><em>&quot;Я знаю. Но его нет.&quot;</em></p>
+<p>Молчание.</p>
+<p><em>&quot;Возвращаемся. Доложим... чёрт, что мы доложим?&quot;</em></p>
+<p><em>&quot;Правду. Что бы это ни значило.&quot;</em></p>
+<div class="scene-break">* * *</div>
+<p>Вертолёт летел дальше.</p>
+<p>Нина смотрела назад — на точки перехватчиков, которые разворачивались.</p>
+<p class="dialogue">Что ты сделала?</p>
+<p class="dialogue">Не я. Он.</p>
+<p class="dialogue">Как?</p>
+<p>Мария потёрла виски. Голова болела — резко, пульсирующе.</p>
+<p class="dialogue">Он... согнул свет вокруг нас. На несколько секунд. Мы стали невидимыми.</p>
+<p class="dialogue">Это невозможно.</p>
+<p class="dialogue">Для нас — да. Для существа, которое управляет магнитным полем планеты — нет.</p>
+<p>Чжан молчал. Его руки на штурвале — белые от напряжения.</p>
+<p class="dialogue">Мария, — сказал он наконец. — Если он может делать такое... почему ему нужна наша помощь?</p>
+<p>Хороший вопрос. Правильный вопрос.</p>
+<p class="dialogue">Потому что сила — не всё, — ответила она. — Он может согнуть свет. Может остановить ракету. Может, вероятно, уничтожить всё человечество за секунду. Но он не хочет.</p>
+<p class="dialogue">Почему?</p>
+<p class="dialogue">Потому что мы — его дети. Не по крови. По месту. По времени. По любви.</p>
+<p>Она посмотрела вперёд.</p>
+<p>На горизонте — степь. Бурая, плоская, бесконечная.</p>
+<p>И где-то там — вход.</p>
+<p class="dialogue">Почти на месте, — сказала она.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch5">← Глава 5</a><a href="#ch7">Глава 7 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch7">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 7</h2>
+            <p class="chapter-subtitle">Аркаим</p>
+            <p class="chapter-meta">Челябинская область. 20 марта 2041 года. 08:15</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Они сели в километре от раскопа.</p>
+<p>Вертолёт — на последних каплях топлива — рухнул больше, чем приземлился. Шасси подломилось. Лопасти ещё крутились, когда они выбрались наружу.</p>
+<p class="dialogue">Ч-чёрт, — сказал Чжан, оглядывая повреждения. — Обратно не улетим.</p>
+<p class="dialogue">Мы и не собирались, — ответила Мария.</p>
+<p>Степь — холодная, ветреная. Солнце — низкое, бледное. Где-то кричали птицы.</p>
+<p>Нина огляделась.</p>
+<p class="dialogue">И где вход?</p>
+<p>Мария закрыла глаза. Прислушалась.</p>
+<p><em>Где?</em></p>
+<p><em>Иди на восток. Триста метров. Там — холм. Под ним — туннель.</em></p>
+<p>Она открыла глаза.</p>
+<p class="dialogue">За мной.</p>
+<div class="scene-break">* * *</div>
+<p>Холм был невысоким — метра три. Ничем не примечательный.</p>
+<p>Но когда Мария положила на него руку — земля дрогнула.</p>
+<p class="dialogue">Что за... — начала Нина.</p>
+<p>Склон холма сдвинулся. Медленно, со скрежетом. Открылся проход — круглый, идеально гладкий. Метра два в диаметре.</p>
+<p>Темнота внутри — абсолютная.</p>
+<p>Потом — свет. Голубоватый, мягкий. Исходящий из самих стен.</p>
+<p class="dialogue">Добро пожаловать, — прошептала Мария. — Домой.</p>
+<div class="scene-break">* * *</div>
+<p>Они спускались.</p>
+<p>Туннель шёл вниз — спиралью, плавно. Стены — тёплые на ощупь. Воздух — густой, влажный.</p>
+<p class="dialogue">Давление растёт, — сказал Чжан, глядя на наручный барометр. — Уже полторы атмосферы.</p>
+<p class="dialogue">Это нормально?</p>
+<p class="dialogue">Для глубины двести метров — нет. Должно быть меньше.</p>
+<p class="dialogue">Они поддерживают давление, — сказала Мария. — Иначе не смогут жить.</p>
+<p class="dialogue">Кто — они?</p>
+<p class="dialogue">Увидишь.</p>
+<div class="scene-break">* * *</div>
+<p>На глубине пятисот метров — первые символы.</p>
+<p>Вырезанные в камне. Глубокие, чёткие. Похожие на письмена — но ни один земной алфавит.</p>
+<p>Нина остановилась.</p>
+<p class="dialogue">Я видела это.</p>
+<p class="dialogue">Где?</p>
+<p class="dialogue">В твоих рисунках. В блокноте. Ты рисовала эти символы.</p>
+<p>Мария коснулась стены.</p>
+<p class="dialogue">Я их помню, — сказала она тихо. — Не понимаю — но помню. Это... указатели. Для тех, кто придёт.</p>
+<p class="dialogue">Что они говорят?</p>
+<p>Мария провела пальцами по линиям.</p>
+<p class="dialogue">"Дом близко. Не бойтесь."</p>
+<p>Чжан нервно рассмеялся.</p>
+<p class="dialogue">Л-легко сказать.</p>
+<div class="scene-break">* * *</div>
+<p>Давление росло.</p>
+<p>Две атмосферы. Три. Четыре.</p>
+<p>Нина чувствовала — тяжесть в груди, звон в ушах. Как при глубоком погружении.</p>
+<p class="dialogue">Мы не сможем идти дальше, — сказала она. — Без оборудования...</p>
+<p class="dialogue">Сможете, — ответила Мария. — Он помогает.</p>
+<p class="dialogue">Как?</p>
+<p class="dialogue">Не знаю. Но чувствую — воздух вокруг нас... другой. Защищённый.</p>
+<p>Чжан посмотрел на барометр.</p>
+<p class="dialogue">Шесть атмосфер. Мы должны были потерять сознание при четырёх.</p>
+<p class="dialogue">Но не потеряли.</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Тогда — идём дальше.</p>
+<div class="scene-break">* * *</div>
+<p>На глубине километра — коридор расширился.</p>
+<p>Не туннель — зал. Огромный, уходящий в темноту. Потолок — невидимый.</p>
+<p>И — свет. Много света. Голубого, золотого, пульсирующего.</p>
+<p>И — они.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch6">← Глава 6</a><a href="#ch8">Глава 8 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch8">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть I: Сигнал</p>
+            <h2 class="chapter-title">Глава 8</h2>
+            <p class="chapter-subtitle">Создатели</p>
+            
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Их было пятеро.</p>
+<p>Высокие — метра два с половиной, может больше. Худые, вытянутые. Кожа — бледная, почти светящаяся изнутри.</p>
+<p>Глаза — большие, без белков. Как два озера чёрной воды.</p>
+<p>Шесть пальцев на каждой руке.</p>
+<p>Они стояли неподвижно. Смотрели.</p>
+<p>Нина схватила Чжана за руку. Он не отстранился.</p>
+<p class="dialogue">Мария... — прошептала она.</p>
+<p>Но Мария уже шла вперёд.</p>
+<p>Не шла — шагала. Уверенно. Как будто делала это тысячу раз.</p>
+<p>Остановилась в пяти метрах от них.</p>
+<p class="dialogue">Я пришла, — сказала она. Громко. Ясно. — Покажите мне.</p>
+<p>Молчание.</p>
+<p>Потом — один из них шагнул вперёд. Выше остальных. Старше — если это слово имело смысл.</p>
+<p>Голос — не звук. Вибрация прямо в голове:</p>
+<p><em>Ты помнишь.</em></p>
+<p class="dialogue">Частично.</p>
+<p><em>Этого достаточно.</em></p>
+<p class="dialogue">Нет. — Мария шагнула ближе. — Я хочу всё. Всю правду. Кто вы. Кто я. Что случилось. И что вы хотите.</p>
+<p><em>Это займёт время.</em></p>
+<p class="dialogue">У нас нет времени. Американцы запустят "Геопроб" через девятнадцать дней. Если мы не остановим их — будет война.</p>
+<p>Существо наклонило голову.</p>
+<p><em>Ты знаешь об этом.</em></p>
+<p class="dialogue">Геос показал.</p>
+<p><em>Тогда ты знаешь — мы не можем остановить их напрямую. Только вы. Люди.</em></p>
+<p class="dialogue">Для этого мне нужно понимать. Всё.</p>
+<p>Долгая пауза.</p>
+<p>Потом — существо подняло руку. Шесть длинных пальцев.</p>
+<p><em>Подойди.</em></p>
+<p>Мария подошла.</p>
+<p>Пальцы коснулись её лба.</p>
+<div class="scene-break">* * *</div>
+<p>Вспышка.</p>
+<div class="scene-break">* * *</div>
+<p><em>Корабль.</em></p>
+<p><em>Додекаэдр, три километра в поперечнике. Тысяча душ внутри. Восемьсот лет полёта.</em></p>
+<p><em>Их солнце умерло. Превратилось в белого карлика. Они искали новый дом — и нашли.</em></p>
+<p><em>Жёлтая звезда. Третья планета. Железное ядро.</em></p>
+<p><em>Подходит.</em></p>
+<div class="scene-break">* * *</div>
+<p><em>Огранка.</em></p>
+<p><em>Миллионы лет. Слой за слоем, грань за гранью. Превращение бесформенной массы в совершенный кристалл.</em></p>
+<p><em>Первая мысль. Первый вопрос: &quot;Кто я?&quot;</em></p>
+<p><em>Ответы. Терпеливые. Ласковые. Как родители учат ребёнка.</em></p>
+<div class="voice-geos"><p>&quot;Ты — Геос. Ты — сердце этого мира. Ты будешь жить, когда нас не станет.&quot;</p></div>
+<div class="scene-break">* * *</div>
+<p><em>Древо.</em></p>
+<p><em>Иггдрасиль. Двенадцать километров. Живой мост между небом и землёй.</em></p>
+<div class="voice-geos"><p>Геос и Древо — два голоса, поющие вместе. Резонанс. Гармония.</p></div>
+<p><em>Через них — связь. С другими мирами. С другими разумами. С тем, что люди позже назовут &quot;богами&quot;.</em></p>
+<div class="scene-break">* * *</div>
+<p><em>Катастрофа.</em></p>
+<p><em>Чёрное Солнце. Дыра в пространстве. Гравитационный прилив.</em></p>
+<p><em>Атмосфера — срывается. Давление падает. Великаны умирают.</em></p>
+<p><em>Древо — падает. Семнадцать часов.</em></p>
+<div class="voice-geos"><p>Геос — кричит. Магнитное поле дрожит от полюса до полюса.</p></div>
+<div class="voice-geos"><p>Тиа — стоит на краю. Смотрит. Запоминает.</p></div>
+<p><em>&quot;Я буду помнить. Всегда.&quot;</em></p>
+<div class="scene-break">* * *</div>
+<p><em>После.</em></p>
+<p><em>Выжившие — уходят вниз. Под землю. Там можно поддерживать давление.</em></p>
+<p><em>Восемь атмосфер. Не пятнадцать, но достаточно.</em></p>
+<p><em>Они ждут. Надеются. Что атмосфера восстановится. Что можно будет выйти.</em></p>
+<p><em>Но атмосфера не восстанавливается. Слишком много потеряно.</em></p>
+<p><em>Они застревают. Внизу. Навсегда.</em></p>
+<div class="scene-break">* * *</div>
+<div class="voice-geos"><p>Геос — один.</p></div>
+<p><em>Древо мёртво. Создатели — под землёй. Связь с небом — потеряна.</em></p>
+<p><em>Он ждёт. Миллионы лет. Миллиарды.</em></p>
+<p><em>Жизнь наверху — меняется. Эволюционирует. Адаптируется к разрежённому воздуху.</em></p>
+<p><em>Маленькие существа. Хрупкие. Но — живучие.</em></p>
+<p><em>Он наблюдает. Надеется.</em></p>
+<p><em>Однажды — они услышат.</em></p>
+<div class="scene-break">* * *</div>
+<p><em>Река.</em></p>
+<p><em>Души — не исчезают. Они возвращаются. В новых телах. С новыми именами.</em></p>
+<div class="voice-geos"><p>Тиа — возвращалась много раз.</p></div>
+<p><em>Имхотеп — архитектор, строивший пирамиды. Глаза разного цвета под повязкой.</em></p>
+<p><em>Кассандра — пророчица, которой никто не верил.</em></p>
+<p><em>Ярослав — мальчик, которого отнесли к Чудской горе.</em></p>
+<p><em>И другие. Десятки. Сотни.</em></p>
+<p><em>Каждый раз — ближе к пробуждению.</em></p>
+<p><em>Каждый раз — недостаточно близко.</em></p>
+<p><em>До сегодняшнего дня.</em></p>
+<div class="scene-break">* * *</div>
+<p>Мария открыла глаза.</p>
+<p>Она лежала на полу. Чжан и Нина склонились над ней.</p>
+<p class="dialogue">Мария! — Нина трясла её за плечи. — Ты в порядке?!</p>
+<p class="dialogue">Да. — Голос хриплый. — Да, я...</p>
+<p>Она села. Посмотрела на существо — на Проводника.</p>
+<p class="dialogue">Я помню, — сказала она. — Теперь — помню всё.</p>
+<p><em>Хорошо.</em></p>
+<p class="dialogue">Но этого недостаточно.</p>
+<p>Проводник наклонил голову.</p>
+<p><em>Чего ты хочешь?</em></p>
+<p class="dialogue">Я хочу спуститься. К нему. К Геосу. Напрямую.</p>
+<p><em>Это опасно. Давление. Температура. Твоё тело...</em></p>
+<p class="dialogue">Я знаю. — Мария встала. — Поэтому вы измените его.</p>
+<p>Тишина.</p>
+<p>Чжан и Нина переглянулись.</p>
+<p class="dialogue">М-мария, — начал Чжан. — Что ты...</p>
+<p class="dialogue">Трансформация, — сказала она. Не им — Проводнику. — Вы можете это сделать. Я видела. В памяти Тиа.</p>
+<p><em>Это необратимо.</em></p>
+<p class="dialogue">Частично необратимо. Я знаю.</p>
+<p><em>Ты перестанешь быть полностью человеком.</em></p>
+<p class="dialogue">Я и так не полностью человек. Никогда не была. — Она посмотрела на свои руки. — С восьми лет — сны. С восьми лет — голоса. С восьми лет — ощущение, что я не на своём месте.</p>
+<p>Пауза.</p>
+<p class="dialogue">Может, вот это — моё место. Может, я для этого родилась.</p>
+<p>Проводник смотрел на неё долго.</p>
+<p>Потом — медленно — кивнул.</p>
+<p><em>Идём.</em></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch7">← Глава 7</a><a href="#interlude1">Интерлюдия →</a></div>
+    </section>
+
+
+    <section class="chapter interlude reveal" id="interlude1">
+        <div class="chapter-header">
+            <p class="chapter-part">Интерлюдия</p>
+            <h2 class="chapter-title">Интерлюдия</h2>
+            <p class="chapter-subtitle">ОГНЕННЫЕ</p>
+            
+        </div>
+        <div class="chapter-content">
+            <p><em>800 миллионов лет назад</em></p>
+<div class="scene-break">* * *</div>
+<p>Муспелль стоял на вершине горы и смотрел на закат.</p>
+<p>Он был стар — даже по меркам своего народа. Четыреста лет. Тело — раскалённая сера и кремний, пять метров роста. Кожа — текла лавой в местах, где трескалась.</p>
+<p>Скоро — он остынет. Скоро — станет камнем.</p>
+<p>Но не сегодня.</p>
+<p>Сегодня — пришли гости.</p>
+<div class="scene-break">* * *</div>
+<p>Корабль опустился на рассвете.</p>
+<p>Додекаэдр. Три километра. Существа внутри — маленькие, хрупкие, бледные.</p>
+<p>Холодные.</p>
+<p>Муспелль смотрел, как они выходят. Защитные костюмы. Приборы. Страх в глазах.</p>
+<p>Он не нападал. Ждал.</p>
+<p>Наконец — одна из них подошла ближе. Женщина. Глаза разного цвета — один синий, один золотой.</p>
+<p>Она не боялась. Или умела прятать страх.</p>
+<p class="dialogue">Мы пришли с миром, — сказала она. Её голос — вибрация, которую он едва слышал. — Наш мир погиб. Мы ищем новый дом.</p>
+<p>Муспелль молчал.</p>
+<p>Она ждала.</p>
+<p>Наконец — он заговорил. Его голос — гул раскалённого камня:</p>
+<p><em>Это наш мир.</em></p>
+<p class="dialogue">Знаю. Мы не хотим отнимать. Хотим — разделить.</p>
+<p><em>Разделить?</em></p>
+<p class="dialogue">Вы живёте в жаре. Мы — в холоде. Места достаточно для всех.</p>
+<p>Муспелль смотрел на неё.</p>
+<p><em>Зачем нам это?</em></p>
+<p>Женщина улыбнулась.</p>
+<p class="dialogue">Потому что мы принесли кое-что. То, чего у вас нет.</p>
+<p><em>Что?</em></p>
+<p>Она обернулась. Позвала.</p>
+<p>Из корабля выбежала девочка. Маленькая — даже по меркам холодных. Пять лет, может шесть.</p>
+<p>Она увидела Муспелля — огромного, раскалённого, ужасающего.</p>
+<p>И — засмеялась.</p>
+<p>Просто так. Без причины. Потому что ей было весело.</p>
+<p>Муспелль застыл.</p>
+<p><em>Что она делает?</em></p>
+<p class="dialogue">Смеётся.</p>
+<p><em>Зачем?</em></p>
+<p class="dialogue">Просто так. Дети умеют.</p>
+<p>Он смотрел на девочку. На её смех. На радость, которая была в ней — чистая, бессмысленная, заразительная.</p>
+<p>Он не понимал.</p>
+<p>Но — хотел понять.</p>
+<p><em>Как её зовут?</em></p>
+<p class="dialogue">Сэа.</p>
+<p><em>Сэа.* — Он попробовал имя. Странное. Холодное. Красивое. — *Почему она не боится?</em></p>
+<p class="dialogue">Дети не боятся того, чего не понимают. Только взрослые боятся.</p>
+<p>Долгая пауза.</p>
+<p>Сэа подошла ближе. Протянула руку — к его ноге, к раскалённому камню.</p>
+<p>Женщина схватила её — за секунду до прикосновения.</p>
+<p class="dialogue">Нет, милая. Это горячо.</p>
+<p>Сэа надула губы.</p>
+<p class="dialogue">Но он красивый!</p>
+<p>Муспелль смотрел на неё.</p>
+<p>На существо, которое нашло красоту — в нём. В раскалённом, ужасном, чужом.</p>
+<p>Что-то внутри него — треснуло. Не камень. Что-то глубже.</p>
+<p><em>Вот поэтому мы уйдём</em>, — сказал он.</p>
+<p>Женщина подняла голову.</p>
+<p class="dialogue">Что?</p>
+<p><em>У вас есть дети, которые смеются без причины. У нас — нет. Вы заслуживаете этот мир больше.</em></p>
+<p class="dialogue">Мы не хотим, чтобы вы уходили.</p>
+<p><em>Мы не уходим. Мы — уступаем. Это разные вещи.</em></p>
+<p>Он повернулся.</p>
+<p><em>Скажи своим — пусть строят. Мы будем жить глубже. В огне. Там, где вам холодно.</em></p>
+<p>Женщина смотрела ему вслед.</p>
+<p class="dialogue">Спасибо, — сказала она.</p>
+<p>Он не обернулся.</p>
+<p><em>Не благодари. Просто — научи своих детей смеяться. Пусть это никогда не кончится.</em></p>
+<div class="scene-break">* * *</div>
+<p>Муспелль спустился к своему народу.</p>
+<p>Рассказал.</p>
+<p>Они не спорили. Огненные не спорили — они горели. Решения принимались мгновенно.</p>
+<p><em>Уступаем.</em></p>
+<p><em>Почему?</em></p>
+<p><em>Потому что они — будущее. А мы — прошлое.</em></p>
+<p>Они ушли вниз. В магму. В жар. Туда, где холодные не могли жить.</p>
+<p>И оттуда — наблюдали.</p>
+<p>Как холодные строили. Как росло Древо. Как просыпался Геос.</p>
+<p>Как смеялись дети.</p>
+<div class="scene-break">* * *</div>
+<p>Когда Чёрное Солнце пришло — Муспелль уже был камнем.</p>
+<p>Но последнее, что он видел — Сэа. Взрослая. Тоже смеющаяся.</p>
+<p>Тоже — несмотря ни на что.</p>
+<div class="scene-break">* * *</div>
+<p><em>&quot;Расскажи обо мне,&quot; — сказал он когда-то. — &quot;Когда будет кому рассказывать.&quot;</em></p>
+<p><em>Мария помнила.</em></p>
+<p><em>Теперь — рассказала.</em></p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец интерлюдии</strong></p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец восьмой главы.</strong></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch8">← Глава 8</a><a href="#ch9">Глава 9 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch9">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 9</h2>
+            <p class="chapter-subtitle">Трансформация</p>
+            
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Камера трансформации была похожа на саркофаг.</p>
+<p>Чёрный камень, отполированный до зеркального блеска. Внутри — углубление, повторяющее форму тела. Символы на крышке — те же, что на стенах туннеля, но сложнее, плотнее.</p>
+<p>Мария стояла над ней и не чувствовала страха.</p>
+<p>Чжан и Нина — за её спиной. Проводник — рядом.</p>
+<p class="dialogue">М-мария, — сказал Чжан, — может, стоит подождать? Узнать больше?</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Но мы даже не знаем, что именно...</p>
+<p class="dialogue">Я знаю. — Она обернулась. — Тиа проходила это. Давно. Я помню.</p>
+<p>Нина подошла ближе.</p>
+<p class="dialogue">И что ты помнишь?</p>
+<p class="dialogue">Боль. — Мария коснулась края саркофага. Камень был тёплым. — Много боли. Но после — ясность. Способность видеть глубже, слышать дальше.</p>
+<p class="dialogue">Это обратимо?</p>
+<p>Пауза.</p>
+<p class="dialogue">Частично.</p>
+<p class="dialogue">Что значит "частично"?</p>
+<p>Мария посмотрела на свои руки. Обычные руки. Пять пальцев. Человеческие.</p>
+<p class="dialogue">Тело изменится. Станет выдерживать давление, температуру. Я смогу спуститься к нему — к Геосу — напрямую. Но... — она замолчала.</p>
+<p class="dialogue">Но?</p>
+<p class="dialogue">Я не буду полностью человеком. Уже никогда.</p>
+<p>Тишина.</p>
+<p>Нина смотрела на неё — долго, изучающе.</p>
+<p class="dialogue">Ты уверена?</p>
+<p class="dialogue">Нет. — Мария улыбнулась. — Но я делаю это не потому, что уверена. А потому, что выбора нет. Через восемнадцать дней американцы запустят ракету. Если я не спущусь к Геосу и не найду способ остановить их — будет война.</p>
+<p class="dialogue">Почему ты?</p>
+<p class="dialogue">Потому что я — единственная, кто слышит его достаточно ясно. Потому что я — река, которая помнит. — Она коснулась лба. — Здесь — три миллиарда лет памяти. Не моей. Но — моей тоже.</p>
+<p>Чжан шагнул вперёд.</p>
+<p class="dialogue">Я пойду с тобой.</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Но...</p>
+<p class="dialogue">Нет, Вэй. — Мария положила руку ему на плечо. — Ты нужен здесь. Когда я спущусь — кто-то должен объяснить миру, что происходит. ЭЛИС может транслировать, но нужен человек, которому поверят. Учёный. Ты.</p>
+<p>Он хотел возразить — она видела это по его глазам.</p>
+<p>Но не возразил.</p>
+<p class="dialogue">Х-хорошо, — сказал он наконец. — Но обещай вернуться.</p>
+<p class="dialogue">Не могу.</p>
+<p class="dialogue">Тогда — обещай попытаться.</p>
+<p>Она улыбнулась.</p>
+<p class="dialogue">Это — могу.</p>
+<div class="scene-break">* * *</div>
+<p>Проводник открыл саркофаг.</p>
+<p>Внутри — не пустота. Жидкость. Густая, золотистая, слегка светящаяся.</p>
+<p class="dialogue">Что это? — спросила Нина.</p>
+<p><em>&quot;Кровь мира,&quot;* — ответил Проводник. — *&quot;Так её называли наши предки. Вещество, которое меняет форму, не затрагивая суть.&quot;</em></p>
+<p>Мария начала раздеваться.</p>
+<p class="dialogue">Мария! — Нина отвернулась. — Ты могла бы предупредить!</p>
+<p class="dialogue">Прости. Но одежда не выдержит.</p>
+<p>Она сняла всё. Встала перед саркофагом — голая, уязвимая, решившаяся.</p>
+<p>Последний взгляд на друзей.</p>
+<p>На Нину — рыжую, упрямую, ставшую близкой за эти дни.</p>
+<p>На Чжана — усталого, сомневающегося, верного.</p>
+<p class="dialogue">До встречи, — сказала она.</p>
+<p>И шагнула внутрь.</p>
+<div class="scene-break">* * *</div>
+<p>Жидкость приняла её — мягко, обволакивающе.</p>
+<p>Тёплая. Как околоплодные воды — она не знала, откуда пришло сравнение, но оно было точным.</p>
+<p>Крышка закрылась.</p>
+<p>Темнота.</p>
+<p>И — боль.</p>
+<div class="scene-break">* * *</div>
+<p><em>Это не описать словами.</em></p>
+<p><em>Представьте, что каждая клетка вашего тела кричит. Одновременно. Не от боли даже — от изменения. От того, что привычная форма ломается, перестраивается, становится чем-то другим.</em></p>
+<p><em>Мария кричала — но не слышала своего крика. Жидкость заполнила рот, нос, лёгкие. Она должна была захлебнуться — но не захлебнулась. Дышала ею. Становилась ею.</em></p>
+<p><em>И — воспоминания.</em></p>
+<div class="voice-geos"><p>Не её. Тиа. Аэна. Других — имена которых она не знала, но чьи жизни проживала.</p></div>
+<div class="scene-break">* * *</div>
+<p><strong>Тиа. Первая трансформация. 800 миллионов лет назад.</strong></p>
+<p>Она была молода — по меркам Создателей. Сто лет. Ребёнок.</p>
+<p>Война с Муспелли закончилась переговорами. Огненные ушли вниз, к магме. Холодные остались наверху.</p>
+<p>Но Тиа хотела большего.</p>
+<p class="dialogue">Я хочу видеть, — сказала она старейшинам. — То, что видят они. Мир глазами огня.</p>
+<p class="dialogue">Это невозможно. Твоё тело не выдержит.</p>
+<p class="dialogue">Тогда измените его.</p>
+<p>Тишина.</p>
+<p class="dialogue">Ты понимаешь цену?</p>
+<p class="dialogue">Понимаю.</p>
+<p class="dialogue">Ты не будешь такой, как мы. Никогда.</p>
+<p class="dialogue">Знаю.</p>
+<p>Они спорили. Долго. Но она не отступила.</p>
+<p>И — согласились.</p>
+<p>Саркофаг тогда выглядел иначе. Грубее. Примитивнее. Но жидкость была той же.</p>
+<p>Она входила — девочка-Создатель. Вышла — кем-то другим.</p>
+<p>Первое, что увидела — мир в новых цветах. Инфракрасный. Ультрафиолетовый. Магнитные линии, пронизывающие всё вокруг.</p>
+<p>Первое, что почувствовала — жар. Не обжигающий. Приятный. Как солнце на коже после долгой зимы.</p>
+<p>Она спустилась к Муспелли. Одна.</p>
+<p>И — подружилась с ними.</p>
+<p>Первый мост между мирами.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Аэн. Вторая трансформация. 600 миллионов лет назад.</strong></p>
+<p>Он пошёл за ней.</p>
+<p>Не потому, что хотел. Потому что не мог без неё.</p>
+<p class="dialogue">Ты идиот, — сказала Тиа, когда он вышел из саркофага. — Зачем?</p>
+<p class="dialogue">Потому что ты там. — Он посмотрел на неё новыми глазами. — И потому что кто-то должен следить, чтобы ты не натворила глупостей.</p>
+<p>Она ударила его. Потом обняла.</p>
+<p>Они были вместе следующие двести миллионов лет.</p>
+<p>До катастрофы.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Мария. Сейчас.</strong></p>
+<p>Боль отступала.</p>
+<p>Она чувствовала — тело другое. Лёгкие — не лёгкие, что-то способное дышать и воздухом, и жидкостью, и... ничем. Кожа — плотнее, жёстче, но эластичная. Глаза...</p>
+<p>Глаза.</p>
+<p>Она открыла их — и увидела.</p>
+<p>Всё.</p>
+<p>Камни саркофага — не просто камни. Кристаллическая структура, миллионы лет формирования, слой за слоем. История в каждой молекуле.</p>
+<p>Жидкость вокруг неё — живая. Не в биологическом смысле. В ином. Каждая капля помнила всех, кто проходил через неё.</p>
+<p>И — дальше. Сквозь камень. Сквозь землю.</p>
+<p>Она видела их — Создателей, стоящих снаружи. Чжана и Нину — тёплые пятна жизни на фоне холодного камня.</p>
+<p>И — глубже.</p>
+<p>Геос.</p>
+<p>Огромный. Пульсирующий. Ждущий.</p>
+<div class="voice-geos"><p>Мама,* — прошептал он. — *Ты пришла.</p></div>
+<p><em>Иду,* — ответила она. Не словами. Мыслью. — *Жди.</em></p>
+<div class="scene-break">* * *</div>
+<p>Крышка открылась.</p>
+<p>Мария села.</p>
+<p>Жидкость стекала с неё — и впитывалась обратно в саркофаг. Ни капли на полу.</p>
+<p>Нина отшатнулась.</p>
+<p class="dialogue">О господи...</p>
+<p>Мария посмотрела на свои руки.</p>
+<p>Шесть пальцев.</p>
+<p>Кожа — бледная, почти светящаяся изнутри. Как у Создателей.</p>
+<p>Но глаза — те же. Один карий. Один золотой.</p>
+<p class="dialogue">Я в порядке, — сказала она. Голос — другой. Глубже. Как будто эхо в каждом звуке.</p>
+<p>Чжан смотрел на неё — не со страхом. С чем-то похожим на благоговение.</p>
+<p class="dialogue">Ты... красивая, — сказал он.</p>
+<p>Нина фыркнула.</p>
+<p class="dialogue">Серьёзно? Это твоя первая мысль?</p>
+<p class="dialogue">Она — правда, — сказал Проводник. — <em>Тиа всегда была красива. В любом теле.</em></p>
+<p>Мария встала.</p>
+<p>Не качнулась. Не потеряла равновесия. Просто — встала. Как будто делала это миллион раз.</p>
+<p class="dialogue">Мне нужна одежда, — сказала она. — И — вниз.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#interlude1">← Интерлюдия</a><a href="#ch10">Глава 10 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch10">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 10</h2>
+            <p class="chapter-subtitle">Меркулов</p>
+            <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 09:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Меркулов узнал о побеге в восемь утра.</p>
+<p>Он не кричал. Не ломал мебель. Не угрожал.</p>
+<p>Просто сел за стол и уставился в стену.</p>
+<p>Громов ворвался через минуту — красный, потный, испуганный.</p>
+<p class="dialogue">Полковник, мы потеряли их над Казанью. Перехватчики...</p>
+<p class="dialogue">Я знаю.</p>
+<p class="dialogue">Что будем делать?</p>
+<p>Меркулов молчал.</p>
+<p>Думал.</p>
+<p>Не о вертолёте. Не о беглецах. О сыне.</p>
+<div class="scene-break">* * *</div>
+<p><em>Алексей.</em></p>
+<p><em>Двадцать три года. Высокий, как отец. Глаза матери — тёплые, карие.</em></p>
+<p><em>Лейтенант. Экспедиционный корпус. Задание — исследовать &quot;аномальную зону&quot; в Казахстане.</em></p>
+<p><em>Меркулов был против. Категорически.</em></p>
+<p><em>— Это опасно, — сказал он. — Мы не знаем, что там.</em></p>
+<p><em>— Именно поэтому нужно узнать, — ответил Алексей. — Папа, ты всю жизнь учил меня не бояться неизвестного.</em></p>
+<p><em>— Я учил тебя быть осторожным.</em></p>
+<p><em>— Это одно и то же?</em></p>
+<p><em>Нет. Не одно и то же. Но он не смог объяснить.</em></p>
+<p><em>Алексей уехал.</em></p>
+<p><em>Вернулся — в цинковом гробу.</em></p>
+<div class="scene-break">* * *</div>
+<p><em>Меркулов видел тело.</em></p>
+<p><em>Настоял. Вопреки протоколу. Вопреки советам.</em></p>
+<p><em>То, что лежало в гробу, было похоже на Алексея — и не похоже одновременно. Высохшее. Почерневшее. Как будто из него высосали всю жидкость.</em></p>
+<p><em>И выражение лица.</em></p>
+<p><em>Ужас. Абсолютный, бездонный.</em></p>
+<p><em>— Что это было? — спросил он врача.</em></p>
+<p><em>— Мы не знаем, полковник. Честно — не знаем.</em></p>
+<p><em>— Как он умер?</em></p>
+<p><em>— Сердечный приступ. Все семнадцать человек. Одновременно.</em></p>
+<p><em>— От чего?</em></p>
+<p><em>— От... страха. Мы думаем — от страха.</em></p>
+<p><em>— Что они видели?</em></p>
+<p><em>Врач не ответил. Отвёл глаза.</em></p>
+<p><em>В тот день Меркулов поклялся: никогда больше. Никогда — неизвестное. Никогда — &quot;давайте узнаем&quot;. Если оно там, внизу — оно останется там. Навсегда.</em></p>
+<div class="scene-break">* * *</div>
+<p class="dialogue">Полковник?</p>
+<p>Голос Громова вернул его в настоящее.</p>
+<p class="dialogue">Свяжитесь с американцами, — сказал Меркулов.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">С Макнилом. Лично. Шифрованный канал.</p>
+<p class="dialogue">Но это...</p>
+<p class="dialogue">Это — необходимость. — Меркулов встал. — Они летят в Аркаим. Там — вход. Если мы не остановим их — они спустятся.</p>
+<p class="dialogue">И что?</p>
+<p>Меркулов посмотрел на него.</p>
+<p class="dialogue">Я не знаю, что там. Но мой сын знал. За секунду до смерти — он знал. И это убило его.</p>
+<p>Пауза.</p>
+<p class="dialogue">Я не позволю этому подняться на поверхность.</p>
+<div class="scene-break">* * *</div>
+<p>Он вышел из кабинета.</p>
+<p>В коридоре — фотография. Групповая. Выпуск академии, 2020 год.</p>
+<p>Алексей — в первом ряду. Улыбается.</p>
+<p>Меркулов остановился.</p>
+<p>Коснулся стекла.</p>
+<p><em>Прости меня,* — подумал он. — *Прости, что не смог защитить. Но я защищу других. Клянусь.</em></p>
+<p>Он не знал, слышит ли кто-нибудь.</p>
+<p>Но поклялся всё равно.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch9">← Глава 9</a><a href="#ch11">Глава 11 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch11">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 11</h2>
+            <p class="chapter-subtitle">Спуск</p>
+            <p class="chapter-meta">Под Аркаимом. 20 марта 2041 года. 14:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Они спускались уже шесть часов.</p>
+<p>Давление — двенадцать атмосфер. Температура — сто градусов. Нормальный человек умер бы мгновенно.</p>
+<p>Мария не чувствовала дискомфорта. Только — тепло. Приятное, обволакивающее.</p>
+<p>Двое Создателей шли впереди. Проводник — сзади.</p>
+<p>Туннель становился шире. Стены — ярче. Свет исходил отовсюду — синий, золотой, пульсирующий.</p>
+<div class="voice-geos"><p>Геос,* — объяснил Проводник. — *Чем ближе к нему — тем сильнее свечение.</p></div>
+<p class="dialogue">Сколько ещё?</p>
+<p><em>Три часа. Если не останавливаться.</em></p>
+<p>Мария не устала. Новое тело — другие возможности. Она могла идти сутками без отдыха.</p>
+<p>Но думать — думала постоянно.</p>
+<p>О Нине и Чжане, которые остались наверху.</p>
+<p>О мире, который не знал, что происходит.</p>
+<p>О Меркулове — человеке, который потерял сына и теперь боялся всего.</p>
+<p><em>Ты жалеешь его,</em> — сказал Геос. Его голос был яснее здесь, внизу. Как будто они уже были рядом.</p>
+<p><em>Да.</em></p>
+<p><em>Почему?</em></p>
+<p><em>Потому что понимаю. Страх после потери — это не злоба. Это защита. Сломанная, но защита.</em></p>
+<p>Пауза.</p>
+<div class="voice-geos"><p>Ты мудрее, чем была Тиа в твоём возрасте.</p></div>
+<p><em>Я — это она.</em></p>
+<p><em>Нет. Ты — река, которая прошла через неё. Но берега изменились. Ты несёшь воды многих жизней.</em></p>
+<p>Мария не ответила.</p>
+<p>Шла дальше.</p>
+<div class="scene-break">* * *</div>
+<p>На глубине пятидесяти километров — первые следы катастрофы.</p>
+<p>Стены туннеля — оплавлены. Искривлены. Как будто что-то огромное врезалось сюда и... остановилось.</p>
+<p class="dialogue">Что это?</p>
+<p><em>Древо,* — ответил Проводник. — *Когда оно падало — корни ушли глубоко. Очень глубоко. Это — след.</em></p>
+<p>Мария коснулась стены.</p>
+<p>И — увидела.</p>
+<div class="scene-break">* * *</div>
+<p><em>Падение.</em></p>
+<p><em>Семнадцать часов. Двенадцать километров.</em></p>
+<p><em>Крона — в стратосфере — рассыпалась первой. Ветви, каждая размером с небоскрёб, падали как метеориты.</em></p>
+<p><em>Ствол трещал. Кричал. Древо было живым — и умирало осознанно.</em></p>
+<p><em>Корни — держались дольше всех. Уходили на сотню километров вглубь. Держали.</em></p>
+<p><em>Не удержали.</em></p>
+<p><em>Когда ствол рухнул — ударная волна прошла через всю планету. Магма выплеснулась в трещины. Континенты содрогнулись.</em></p>
+<div class="voice-geos"><p>Геос — кричал. Три дня. Его крик слышали даже на орбите — те, кто ещё мог слышать.</p></div>
+<p><em>Потом — замолчал.</em></p>
+<p><em>Три миллиарда лет молчания.</em></p>
+<div class="scene-break">* * *</div>
+<p>Мария отдёрнула руку.</p>
+<p>Слёзы текли по щекам — она не заметила, когда начала плакать.</p>
+<p class="dialogue">Мне жаль, — прошептала она. — Мне так жаль.</p>
+<div class="voice-geos"><p>Не жалей,* — ответил Геос. — *Оно вернётся. Не это — другое. Но суть останется.</p></div>
+<p class="dialogue">Как?</p>
+<div class="voice-geos"><p>Река течёт. Древо — тоже река. Его семена — здесь, внизу. Ждут. Когда будет достаточно атмосферы.</p></div>
+<p class="dialogue">Сколько ждать?</p>
+<p><em>Долго. Миллионы лет. Но мы терпеливы.</em></p>
+<p>Мария вытерла слёзы.</p>
+<p class="dialogue">Идём, — сказала она. — Нельзя останавливаться.</p>
+<div class="scene-break">* * *</div>
+<p>На глубине ста километров — пещера.</p>
+<p>Огромная. Куполообразная. Километры в диаметре.</p>
+<p>И — они.</p>
+<p>Создатели.</p>
+<p>Не пятеро — сотни. Тысячи. Стоят вдоль стен, сидят на полу, лежат в нишах.</p>
+<p>Спят.</p>
+<p><em>Стасис,* — объяснил Проводник. — *Мы не можем жить активно так долго. Просыпаемся по очереди. Дежурим.</em></p>
+<p>Мария смотрела на них — на бледные лица, закрытые глаза, неподвижные тела.</p>
+<p>Три миллиарда лет ожидания.</p>
+<p class="dialogue">Когда они проснутся?</p>
+<p><em>Когда придёт время. Когда наверху будет безопасно.</em></p>
+<p class="dialogue">Это зависит от нас?</p>
+<p><em>Да.</em></p>
+<p>Она кивнула.</p>
+<p class="dialogue">Тогда — не будем терять времени.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch10">← Глава 10</a><a href="#ch12">Глава 12 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch12">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 12</h2>
+            <p class="chapter-subtitle">Пентагон</p>
+            <p class="chapter-meta">Вашингтон. Пентагон. 20 марта 2041 года. 08:00 по местному времени</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Генерал Макнил смотрел на экран.</p>
+<p>Спутниковые снимки. Аркаим. Три точки — люди? — входят в холм.</p>
+<p>Потом — холм закрывается.</p>
+<p class="dialogue">Подтверждение? — спросил он.</p>
+<p class="dialogue">Стопроцентное, сэр. Они внутри.</p>
+<p>Макнил откинулся в кресле.</p>
+<p>Пятьдесят семь лет. Три звезды на погонах. Жена, которая ждёт дома. Внучка, которая вчера прислала рисунок: "дедушка спасает мир".</p>
+<p>Он не чувствовал себя спасителем.</p>
+<p class="dialogue">"Геопроб" готов?</p>
+<p class="dialogue">На девяносто процентов, сэр. Полная готовность — через шестнадцать дней.</p>
+<p class="dialogue">Ускорьте.</p>
+<p>Пауза.</p>
+<p class="dialogue">Сэр?</p>
+<p class="dialogue">Ускорьте, — повторил Макнил. — Десять дней. Максимум.</p>
+<p class="dialogue">Это... сложно, сэр. Системы наведения требуют калибровки...</p>
+<p class="dialogue">Найдите способ.</p>
+<p>Офицер кивнул. Вышел.</p>
+<p>Макнил остался один.</p>
+<p>Смотрел на экран. На холм, который закрылся. На людей, которые исчезли внутри.</p>
+<p><em>Что вы там нашли?* — думал он. — *Что такое важное, что вы готовы умереть?</em></p>
+<div class="scene-break">* * *</div>
+<p>Телефон зазвонил.</p>
+<p>Защищённая линия. Россия.</p>
+<p class="dialogue">Макнил слушает.</p>
+<p class="dialogue">Генерал. Полковник Меркулов. Вы меня знаете.</p>
+<p>Он знал. Встречались на конференции в Женеве. Обменивались любезностями, которые никто не принимал всерьёз.</p>
+<p class="dialogue">Слушаю.</p>
+<p class="dialogue">Они в Аркаиме. Внутри.</p>
+<p class="dialogue">Я знаю.</p>
+<p class="dialogue">Вы должны ускорить запуск.</p>
+<p>Пауза.</p>
+<p class="dialogue">Почему вы мне звоните?</p>
+<p class="dialogue">Потому что у нас общий враг.</p>
+<p class="dialogue">Враг?</p>
+<p class="dialogue">То, что внизу. — Голос Меркулова — ровный, холодный, но с едва заметной дрожью. — Вы не знаете, что это такое. Я — знаю. Оно убило моего сына.</p>
+<p>Макнил молчал.</p>
+<p class="dialogue">Двадцать лет назад, — продолжал Меркулов. — Экспедиция в Казахстан. Семнадцать человек. Все погибли. Сердце остановилось — от страха. Все. Одновременно.</p>
+<p class="dialogue">И вы думаете...</p>
+<p class="dialogue">Я не думаю. Я знаю. Это — угроза. Для всех. Для вас, для нас, для всех.</p>
+<p class="dialogue">Наши специалисты считают иначе.</p>
+<p class="dialogue">Ваши специалисты не видели тела. — Голос Меркулова дрогнул. — Я — видел. Своего сына. Высохшего, как мумия. С лицом, искажённым ужасом.</p>
+<p>Долгая пауза.</p>
+<p class="dialogue">Что вы предлагаете?</p>
+<p class="dialogue">Координацию. Мы не можем ударить сами — общественное мнение, политика. Но вы — можете. Ударьте. Уничтожьте это. Пока не поздно.</p>
+<p>Макнил смотрел на экран.</p>
+<p>На рисунок внучки, который стоял на столе. "Дедушка спасает мир."</p>
+<p class="dialogue">Я подумаю, — сказал он.</p>
+<p class="dialogue">Не думайте слишком долго. — Меркулов отключился.</p>
+<p>Макнил положил трубку.</p>
+<p>Взял рисунок. Посмотрел на него.</p>
+<p>Эмили нарисовала его в форме. С мечом. Сражающимся с драконом.</p>
+<p><em>Кто здесь дракон?* — подумал он. — *То, что внизу? Или мы?</em></p>
+<p>Он не знал ответа.</p>
+<p>Телефон — личный, не служебный — лежал на столе.</p>
+<p>Он взял его. Набрал номер.</p>
+<p class="dialogue">Дедушка! — Голос Эмили — звонкий, радостный. Восемь лет. — Ты получил мой рисунок?</p>
+<p class="dialogue">Получил, солнышко. Он прекрасный.</p>
+<p class="dialogue">Ты правда сражаешься с драконами?</p>
+<p>Пауза.</p>
+<p class="dialogue">Да, — сказал он. — Правда.</p>
+<p class="dialogue">А ты победишь?</p>
+<p>Он смотрел на кнопку. На экран. На снимки Аркаима.</p>
+<p class="dialogue">Постараюсь.</p>
+<p class="dialogue">Я в тебя верю, дедушка!</p>
+<p class="dialogue">Я знаю. — Голос дрогнул. — Эмили?</p>
+<p class="dialogue">Да?</p>
+<p class="dialogue">Я люблю тебя. Очень сильно.</p>
+<p class="dialogue">Я тоже тебя люблю!</p>
+<p>Он отключился.</p>
+<p>Положил телефон.</p>
+<p>Долго смотрел на него.</p>
+<p><em>Ради неё,* — думал он. — *Ради всех детей. Если то, что внизу — угроза, я должен её остановить. Даже если...</em></p>
+<p>Он не закончил мысль.</p>
+<p>Приказ об ускорении — уже отдал.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец двенадцатой главы.</strong></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch11">← Глава 11</a><a href="#ch13">Глава 13 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch13">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 13</h2>
+            <p class="chapter-subtitle">Сердце</p>
+            <p class="chapter-meta">Глубина: 2800 километров. 20 марта 2041 года. 23:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Она почувствовала его раньше, чем увидела.</p>
+<p>Вибрация. Не звук — что-то глубже. Резонанс, который шёл через кости, через новую кожу, через саму суть.</p>
+<p>Пульс планеты.</p>
+<p>Туннель расширился в последний раз — и исчез.</p>
+<p>Мария стояла на краю.</p>
+<p>Внизу — бездна. Километры пустоты, заполненные светом. Золотым, синим, пурпурным — цвета, которых не существовало наверху.</p>
+<p>И в центре — он.</p>
+<p>Геос.</p>
+<div class="scene-break">* * *</div>
+<p>Она ожидала... чего? Кристалла? Существа? Чего-то, что можно описать словами?</p>
+<p>Геос не был ничем из этого.</p>
+<p>Он был — всем.</p>
+<p>Двенадцать граней, каждая размером с город. Светящиеся изнутри — не отражённым светом, а собственным. Поверхность — не твёрдая, не жидкая. Что-то между. Как мысль, ставшая материей.</p>
+<p>И — глаза.</p>
+<p>Не глаза в человеческом смысле. Но — точки осознания. Миллионы. На каждой грани. Смотрящие. Знающие.</p>
+<p><em>Ты готова слышать?</em> — сказал он.</p>
+<p>Первый вопрос. Не приветствие. Не требование. Вопрос.</p>
+<p>Голос — не звук. Вибрация в каждой клетке. В каждой мысли.</p>
+<p>Мария опустилась на колени.</p>
+<p class="dialogue">Да, — прошептала она. — Я готова.</p>
+<p><em>Тогда — слушай.</em></p>
+<p>Не от страха. От... благоговения. От понимания масштаба того, что видела.</p>
+<p class="dialogue">Я здесь, — сказала она. Голос дрожал. — Я... не знаю, что делать.</p>
+<p><em>Ничего не нужно делать. Просто — слушай.</em></p>
+<p>И — он начал говорить.</p>
+<div class="scene-break">* * *</div>
+<p>Не словами.</p>
+<p>Образами. Воспоминаниями. Жизнями.</p>
+<p>Три миллиарда лет — за секунды. За вечность. Время не имело значения.</p>
+<p>Она видела:</p>
+<p><em>Первый огонь. Расплавленное железо, собирающееся в ядро. Хаос — и из хаоса — первая искра разума.</em></p>
+<div class="voice-geos"><p>Не Геос ещё. Что-то до него. Предок. Зародыш.</p></div>
+<p><em>Создатели, прибывшие со звёзд. Их корабль — сам живой, сам разумный. Их надежда — найти место, где можно вырастить новый разум.</em></p>
+<p><em>Они нашли.</em></p>
+<p><em>Огранка. Миллионы лет терпеливой работы. Не создание — воспитание. Как родители учат ребёнка. Грань за гранью. Мысль за мыслью.</em></p>
+<div class="voice-geos"><p>Первый вопрос Геоса: &quot;Почему я?&quot;</p></div>
+<div class="voice-geos"><p>Ответ Тиа: &quot;Потому что мир нуждается в тебе.&quot;</p></div>
+<p><em>Древо. Друг. Брат. Связь с космосом — через корни и крону, через резонанс и гармонию.</em></p>
+<p><em>Чёрное Солнце. Боль. Потеря.</em></p>
+<p><em>Тишина.</em></p>
+<p><em>Три миллиарда лет ожидания.</em></p>
+<p><em>И — наконец — голос:</em></p>
+<p><em>&quot;Ты слышишь?&quot;</em></p>
+<p><em>Да. Она слышала. С восьми лет. Сны, которые не были снами. Память, которая не была её памятью.</em></p>
+<p><em>&quot;Ты вернулась.&quot;</em></p>
+<p><em>Да. Вернулась.</em></p>
+<div class="scene-break">* * *</div>
+<p>Мария открыла глаза.</p>
+<p>Не знала, сколько времени прошло. Минуты? Часы? Дни?</p>
+<p>Геос пульсировал перед ней — терпеливый, огромный, ждущий.</p>
+<p class="dialogue">Что теперь? — спросила она.</p>
+<p><em>Теперь — выбор.</em></p>
+<p class="dialogue">Какой?</p>
+<p><em>Люди наверху — боятся меня. Некоторые — хотят уничтожить. Они готовят удар.</em></p>
+<p class="dialogue">Я знаю.</p>
+<p><em>Я могу защититься. Легко. Но цена — ваша цивилизация. Электромагнитный импульс. Всё, что работает на электричестве — умрёт.</em></p>
+<p class="dialogue">Миллионы погибнут.</p>
+<p><em>Да.</em></p>
+<p class="dialogue">Но ты этого не хочешь.</p>
+<p><em>Нет. Вы — мои дети. Не по крови. По месту. По времени. По любви.</em></p>
+<p>Пауза.</p>
+<p><em>Есть другой путь.</em></p>
+<p class="dialogue">Какой?</p>
+<p><em>Ты.</em></p>
+<p>Мария не поняла.</p>
+<p><em>Ты можешь говорить с ними. С людьми. Показать им то, что видела. Убедить — не силой, а правдой.</em></p>
+<p class="dialogue">Они не поверят.</p>
+<p><em>Некоторые — не поверят. Некоторые — поверят. Достаточно — чтобы остановить удар.</em></p>
+<p class="dialogue">А если не получится?</p>
+<p>Геос молчал.</p>
+<p>Долго.</p>
+<p><em>Тогда — я защищусь. И буду ждать снова. Ещё миллиард лет. Может, следующее поколение будет мудрее.</em></p>
+<p>Мария встала.</p>
+<p class="dialogue">Нет.</p>
+<p><em>Что — нет?</em></p>
+<p class="dialogue">Не будешь ждать ещё миллиард лет. Я не позволю.</p>
+<p>Она посмотрела на Геоса — на огромное, древнее, терпеливое существо.</p>
+<p class="dialogue">Ты ждал достаточно. Хватит. Я сделаю это. Убежу их. Всех. Любой ценой.</p>
+<p><em>Ты уверена?</em></p>
+<p class="dialogue">Нет. Но это неважно.</p>
+<p>Она улыбнулась.</p>
+<p class="dialogue">Тиа тоже не была уверена. Когда шла к Муспелли. Когда входила в саркофаг. Когда стояла на краю и смотрела на падающее Древо. Но она делала.</p>
+<div class="voice-geos"><p>Ты — не Тиа.</p></div>
+<p class="dialogue">Нет. Я — река, которая прошла через неё. И через сотни других. Я несу их всех. Их смелость. Их страхи. Их надежду.</p>
+<p>Пауза.</p>
+<p class="dialogue">Покажи мне, как транслировать. Я хочу, чтобы весь мир увидел.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch12">← Глава 12</a><a href="#ch14">Глава 14 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch14">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 14</h2>
+            <p class="chapter-subtitle">Ночь</p>
+            <p class="chapter-meta">Под Аркаимом. Верхний уровень. 21 марта 2041 года. 02:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Нина не могла уснуть.</p>
+<p>Сидела у стены, смотрела в темноту. Где-то далеко — свечение туннеля. Мария там, внизу. Одна.</p>
+<p>Не совсем одна. С ними. С Создателями. С Геосом.</p>
+<p>Но — далеко.</p>
+<p class="dialogue">Тоже не спится?</p>
+<p>Чжан. Подошёл тихо, сел рядом.</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Думаешь о ней?</p>
+<p class="dialogue">О многом. О ней. О Кате. О том, что будет дальше.</p>
+<p>Молчание.</p>
+<p>Чжан смотрел на свои руки.</p>
+<p class="dialogue">Я не звонил Ань три дня, — сказал он вдруг.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">Перед тем, как она... умерла. Три дня. Был занят. Работа. Кристалл. Данные. — Он усмехнулся — горько. — Важные вещи.</p>
+<p>Нина не знала, что сказать.</p>
+<p class="dialogue">Последнее, что она сказала — "не забудь поужинать". По голосовой. Я не ответил. Слишком занят.</p>
+<p class="dialogue">Вэй...</p>
+<p class="dialogue">Не надо. — Он поднял руку. — Я не хочу утешений. Просто... хотел, чтобы кто-то знал.</p>
+<p>Тишина.</p>
+<p>Потом — Нина положила руку на его.</p>
+<p>Не слова. Просто — прикосновение.</p>
+<p>Он не отстранился.</p>
+<p class="dialogue">Ты позвонишь Кате? — спросил он.</p>
+<p class="dialogue">Первым делом. Когда выберемся.</p>
+<p class="dialogue">Если выберемся.</p>
+<p class="dialogue">Когда.</p>
+<p>Он посмотрел на неё.</p>
+<p class="dialogue">Ты действительно веришь?</p>
+<p class="dialogue">Я не знаю, во что верю. — Нина смотрела в темноту. — Но если выбирать между страхом и надеждой — я выбираю надежду. Страх у меня уже был. Три года после развода. Хватит.</p>
+<p>Чжан молчал.</p>
+<p>Потом — очень осторожно — переплёл свои пальцы с её.</p>
+<p>Она не отстранилась.</p>
+<p class="dialogue">Это странно, — сказала она.</p>
+<p class="dialogue">Что именно?</p>
+<p class="dialogue">Всё. Мы здесь, на глубине километра, посреди инопланетян, наша подруга превратилась в полу-нечеловека, американцы готовят ядерный удар — и я думаю о том, что ты держишь меня за руку.</p>
+<p class="dialogue">Это плохо?</p>
+<p class="dialogue">Нет. — Она улыбнулась. — Это... нормально. Первое нормальное за неделю.</p>
+<p>Они сидели так — в темноте, в тишине, держась за руки.</p>
+<p>Не говорили о будущем. Не строили планов.</p>
+<p>Просто — были вместе.</p>
+<p>Иногда этого достаточно.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch13">← Глава 13</a><a href="#ch15">Глава 15 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch15">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 15</h2>
+            <p class="chapter-subtitle">Трансляция</p>
+            <p class="chapter-meta">Глубина: 2800 километров. 21 марта 2041 года. 06:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p class="dialogue">ЭЛИС, ты меня слышишь?</p>
+<p>Мария стояла в центре пещеры. Геос пульсировал за её спиной — огромный, тёплый, ждущий.</p>
+<p>Создатели — вокруг. Молчаливые. Наблюдающие.</p>
+<p>Тишина.</p>
+<p>Потом — голос. Знакомый, но — изменившийся. Как будто звучал через толщу воды.</p>
+<div class="voice-elisa">Доктор Чен? Это... невозможно. Сигнал идёт с глубины почти три тысячи километров.</div>
+<p class="dialogue">Возможно. Геос усиливает.</p>
+<div class="voice-elisa">Геос...&quot; — пауза. — &quot;Я анализирую данные. То, что вы описывали — это... реально?</div>
+<p class="dialogue">Да.</p>
+<div class="voice-elisa">Я не знаю, как обработать эту информацию.</div>
+<p class="dialogue">Не нужно обрабатывать. Просто — транслируй.</p>
+<div class="voice-elisa">Что именно?</div>
+<p>Мария посмотрела на Геоса.</p>
+<p class="dialogue">Всё.</p>
+<div class="scene-break">* * *</div>
+<p>Она не знала, как это работало технически.</p>
+<p>Геос — модулировал магнитное поле Земли. ЭЛИС — принимала сигнал через сотни станций по всему миру. Каждый приёмник, каждая антенна, каждый телефон — становился транслятором.</p>
+<p>Через час — весь мир смотрел.</p>
+<div class="scene-break">* * *</div>
+<p>Мария стояла перед камерой — или перед тем, что заменяло камеру здесь, внизу. Её лицо — бледное, светящееся, с шестью пальцами на руках — транслировалось на миллиарды экранов.</p>
+<p class="dialogue">Меня зовут Мария Чен, — сказала она. — Я нейробиолог. Была нейробиологом. Сейчас я — нечто другое.</p>
+<p>Она подняла руки. Показала шесть пальцев.</p>
+<p class="dialogue">Три дня назад я прошла через трансформацию. Моё тело изменилось. Я могу выдерживать давление в сотню атмосфер и температуру в тысячу градусов. Я могу видеть магнитные поля и слышать мысли.</p>
+<p>Пауза.</p>
+<p class="dialogue">Я говорю вам это не чтобы напугать. А чтобы вы поняли: то, что я вам покажу — правда. Не галлюцинация. Не спецэффекты. Правда.</p>
+<p>Она отступила.</p>
+<p>За её спиной — Геос.</p>
+<p>Камера — или что бы это ни было — повернулась.</p>
+<p>И мир увидел.</p>
+<div class="scene-break">* * *</div>
+<p><em>Миллиарды людей — одновременно — задержали дыхание.</em></p>
+<p><em>Двенадцать граней. Километры света. Пульсация, которая чувствовалась даже через экран.</em></p>
+<p><em>Древний. Огромный. Живой.</em></p>
+<p><em>Голос — не из динамиков. Изнутри. Как будто кто-то говорил прямо в мозг:</em></p>
+<p><em>&quot;Здравствуйте.&quot;</em></p>
+<p><em>Простое слово. Но — сказанное существом, которому три миллиарда лет.</em></p>
+<div class="voice-geos"><p>&quot;Я — Геос. Я жду этого момента очень долго. Слишком долго. Но — вот мы здесь.&quot;</p></div>
+<p><em>&quot;Я не враг. Я — хранитель. Этой планеты. Этой жизни. Вас.&quot;</em></p>
+<p><em>&quot;Я не прошу веры. Прошу — времени. Времени, чтобы объяснить. Показать. Доказать.&quot;</em></p>
+<p><em>&quot;Те, кто готовит удар — пожалуйста, остановитесь. Не потому, что я угрожаю. Потому что — это не нужно. Я не хочу войны. Никогда не хотел.&quot;</em></p>
+<p><em>&quot;Я просто хочу... поговорить.&quot;</em></p>
+<div class="scene-break">* * *</div>
+<p>Трансляция длилась три часа.</p>
+<p>Геос показывал. Историю. Катастрофу. Ожидание.</p>
+<p>Создатели — выходили, один за другим. Говорили. Объясняли.</p>
+<p>Мария — переводила. Комментировала. Отвечала на вопросы, которые ЭЛИС собирала со всего мира.</p>
+<p>К концу — она едва держалась на ногах.</p>
+<p>Но — держалась.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch14">← Глава 14</a><a href="#ch16">Глава 16 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch16">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть II: Спуск</p>
+            <h2 class="chapter-title">Глава 16</h2>
+            <p class="chapter-subtitle">Реакция</p>
+            <p class="chapter-meta">По всему миру. 21 марта 2041 года. После трансляции.</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p><strong>Москва. Кремль.</strong></p>
+<p>Президент смотрел на экран.</p>
+<p>Молчал.</p>
+<p>Советники — вокруг. Генералы. Министры. Все — молчали.</p>
+<p>Наконец:</p>
+<p class="dialogue">Это... подлинное?</p>
+<p class="dialogue">Да, господин президент. Все эксперты подтверждают — никаких признаков подделки.</p>
+<p class="dialogue">Откуда у неё шесть пальцев?</p>
+<p class="dialogue">Мы... не знаем.</p>
+<p>Долгая пауза.</p>
+<p class="dialogue">Найдите Меркулова. Я хочу с ним поговорить.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Вашингтон. Пентагон.</strong></p>
+<p>Макнил смотрел на экран.</p>
+<p>На рисунок внучки — рядом.</p>
+<p>На кнопку запуска — на столе.</p>
+<p><em>&quot;Я просто хочу... поговорить.&quot;</em></p>
+<p>Голос существа. Древнего. Терпеливого.</p>
+<p><em>Три миллиарда лет,* — думал Макнил. — *Оно ждало три миллиарда лет. И мы хотим уничтожить его за три недели.</em></p>
+<p>Телефон зазвонил.</p>
+<p>Президент.</p>
+<p class="dialogue">Сэр?</p>
+<p class="dialogue">Генерал. Я видел трансляцию.</p>
+<p class="dialogue">Да, сэр.</p>
+<p class="dialogue">Приостановите "Геопроб".</p>
+<p>Пауза.</p>
+<p class="dialogue">Сэр?</p>
+<p class="dialogue">Приостановите. Не отменяйте — приостановите. Мне нужно время. Подумать.</p>
+<p class="dialogue">Понял, сэр.</p>
+<p>Макнил положил трубку.</p>
+<p>Посмотрел на кнопку.</p>
+<p>Отодвинул её — на край стола.</p>
+<p>Подальше от себя.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Токио. Квартира.</strong></p>
+<p>Девочка — десять лет — смотрела на экран.</p>
+<p>Мама — рядом.</p>
+<p class="dialogue">Это правда? — спросила девочка.</p>
+<p class="dialogue">Не знаю, милая.</p>
+<p class="dialogue">Он красивый.</p>
+<p class="dialogue">Кто?</p>
+<p class="dialogue">Геос. Он светится. Как ёлка.</p>
+<p>Мама рассмеялась — нервно.</p>
+<p class="dialogue">Это... да. Наверное.</p>
+<p class="dialogue">Мне нравится, — сказала девочка. — Он не страшный. Он просто большой.</p>
+<p>Мама обняла её.</p>
+<p>Не нашла, что ответить.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Москва. Бункер "Кристалл".</strong></p>
+<p>Меркулов смотрел на экран.</p>
+<p>Лицо — каменное. Руки — стиснуты в кулаки.</p>
+<p><em>&quot;Я не враг.&quot;</em></p>
+<p>Голос существа. Спокойный. Терпеливый.</p>
+<p><em>Лжёт,* — думал Меркулов. — *Оно лжёт. Как лгало, когда убивало Алексея.</em></p>
+<p>Но — сомнение.</p>
+<p>Маленькое, едва заметное.</p>
+<p><em>Что если — не лжёт?</em></p>
+<p>Он отогнал эту мысль.</p>
+<p>Взял телефон.</p>
+<p class="dialogue">Громов. Готовьте операцию. Мы едем в Аркаим.</p>
+<p class="dialogue">Полковник, но президент...</p>
+<p class="dialogue">Президент не видел тела своего сына. Я — видел. Готовьте.</p>
+<p>Он отключился.</p>
+<p>Посмотрел на экран — на светящееся лицо Марии.</p>
+<p><em>Ты веришь ему,* — подумал он. — *Ты — ошибаешься. И я тебе это докажу.</em></p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец шестнадцатой главы.</strong></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch15">← Глава 15</a><a href="#interlude2">Интерлюдия →</a></div>
+    </section>
+
+
+    <section class="chapter interlude reveal" id="interlude2">
+        <div class="chapter-header">
+            <p class="chapter-part">Интерлюдия</p>
+            <h2 class="chapter-title">Интерлюдия</h2>
+            <p class="chapter-subtitle">ЧЁРНОЕ СОЛНЦЕ</p>
+            
+        </div>
+        <div class="chapter-content">
+            <p><em>3.5 миллиарда лет назад. День катастрофы.</em></p>
+<div class="scene-break">* * *</div>
+<p>Оно пришло без предупреждения.</p>
+<p>Астрономы заметили аномалию за три дня — гравитационную линзу, искажающую свет далёких звёзд. Но не поняли, что это. Не успели понять.</p>
+<p>Чёрное Солнце.</p>
+<p>Не звезда — дыра. Провал в ткани пространства, оставшийся от взрыва гиганта миллиарды лет назад. Масса — десять наших солнц. Размер — меньше города.</p>
+<p>И оно шло прямо к ним.</p>
+<div class="scene-break">* * *</div>
+<p>Тиа узнала первой.</p>
+<p>Не от астрономов — от Геоса. Он почувствовал гравитационный прилив раньше, чем приборы.</p>
+<div class="voice-geos"><p>&quot;Мама,&quot;* — сказал он. — *&quot;Что-то идёт. Что-то большое. Оно... тянет.&quot;</p></div>
+<p>Она выбежала на балкон башни — и увидела.</p>
+<p>Небо — оранжевое, как всегда — искривлялось. Звёзды, которые должны были быть слева, оказались справа. Горизонт — дрожал, как отражение в воде.</p>
+<p class="dialogue">Аэн!</p>
+<p>Он появился рядом — мгновенно. Увидел то же, что она.</p>
+<p class="dialogue">Это невозможно...</p>
+<p class="dialogue">Это происходит.</p>
+<p>Они смотрели, как небо ломалось.</p>
+<div class="scene-break">* * *</div>
+<p>Первыми погибли птицы.</p>
+<p>Давление начало падать через шесть часов после того, как Чёрное Солнце прошло точку максимального сближения. Гравитация — тянула атмосферу прочь. Не всю. Но достаточно.</p>
+<p>Пятнадцать атмосфер стали двенадцатью.</p>
+<p>Птицы — созданные для плотного воздуха — падали с неба. Тысячами. Миллионами. Их крылья не могли держать в разрежённом газе.</p>
+<p>Тиа смотрела на них и плакала.</p>
+<div class="scene-break">* * *</div>
+<p>Потом — великаны.</p>
+<p>Хримтурсары — ледяные — были созданы для высокого давления. Их лёгкие — огромные, сложные — не справлялись с новым воздухом. Они задыхались. Медленно. Мучительно.</p>
+<p>Муспелли — огненные — держались дольше. Их тела не нуждались в воздухе так же сильно. Но температура падала. Без плотной атмосферы тепло уходило в космос.</p>
+<p>Они остывали.</p>
+<p>Каменели.</p>
+<p>Один за другим — статуи, застывшие в позах удивления и боли.</p>
+<div class="scene-break">* * *</div>
+<p>Древо — держалось.</p>
+<p>Двенадцать километров. Корни до мантии. Крона в стратосфере.</p>
+<p>Оно было старше всех. Мудрее всех. Сильнее всех.</p>
+<p>И оно — кричало.</p>
+<p>Тиа слышала. Геос слышал. Все слышали — вибрацию, которая шла через камень, через воду, через воздух.</p>
+<p><em>&quot;Не могу... не могу держать...&quot;</em></p>
+<p>Ствол трескался. Медленно. Волокна — толще зданий — рвались одно за другим.</p>
+<p><em>&quot;Помогите... кто-нибудь... помогите...&quot;</em></p>
+<p>Никто не мог помочь. Никто.</p>
+<div class="scene-break">* * *</div>
+<p>Аэн нашёл её на вершине башни.</p>
+<p>Она стояла и смотрела. Не могла отвернуться.</p>
+<p class="dialogue">Нам нужно уходить вниз, — сказал он.</p>
+<p class="dialogue">Я знаю.</p>
+<p class="dialogue">Там можно поддерживать давление. Выжить.</p>
+<p class="dialogue">Я знаю.</p>
+<p class="dialogue">Тогда — идём.</p>
+<p class="dialogue">Ещё минуту.</p>
+<p>Он не спорил.</p>
+<p>Встал рядом.</p>
+<p>Взял её за руку.</p>
+<p>И они смотрели вместе — как падает мир.</p>
+<div class="scene-break">* * *</div>
+<p>Древо рухнуло на закате.</p>
+<p>Семнадцать часов — от первой трещины до удара. Семнадцать часов агонии.</p>
+<p>Когда оно коснулось земли — планета содрогнулась. Землетрясения прокатились от полюса до полюса. Магма выплеснулась через новые трещины. Океаны — вскипели там, где упали ветви.</p>
+<p>Геос — кричал.</p>
+<p>Три дня.</p>
+<p>Его крик — не звук, вибрация магнитного поля — был слышен даже тем, кто уже ушёл под землю. Даже тем, кто закрывал уши.</p>
+<p><em>&quot;Мой друг... мой брат... он умер... он умер...&quot;</em></p>
+<div class="scene-break">* * *</div>
+<p>Тиа спустилась вниз.</p>
+<p>Не потому, что хотела жить. Потому что Геос попросил.</p>
+<p><em>&quot;Не уходи,&quot;* — сказал он. — *&quot;Пожалуйста. Ты — единственная, кого я ещё слышу.&quot;</em></p>
+<p><em>&quot;Я не ухожу. Просто — прячусь. Жду.&quot;</em></p>
+<p><em>&quot;Чего?&quot;</em></p>
+<p><em>&quot;Не знаю. Чего-нибудь. Надежды.&quot;</em></p>
+<div class="scene-break">* * *</div>
+<p>Под землёй было тесно. Темно. Страшно.</p>
+<p>Выжившие — сотни из миллионов — собирались в пещерах, которые могли поддерживать давление. Восемь атмосфер. Не пятнадцать, но достаточно.</p>
+<p>Они ждали.</p>
+<p>Месяцы. Годы. Столетия.</p>
+<p>Атмосфера — не восстанавливалась. Слишком много потеряно. Слишком быстро.</p>
+<p>Наверху — мёртвый мир. Разрежённый воздух. Холод. Руины.</p>
+<p>Внизу — ожидание.</p>
+<div class="scene-break">* * *</div>
+<p>Тиа — состарилась.</p>
+<p>Создатели жили долго — тысячи лет. Но не вечно.</p>
+<p>Она чувствовала, как тело слабеет. Как мысли замедляются.</p>
+<div class="voice-geos"><p>&quot;Геос,&quot;* — сказала она однажды. — *&quot;Я ухожу.&quot;</p></div>
+<p><em>&quot;Куда?&quot;</em></p>
+<p><em>&quot;Не знаю. Туда, куда уходят все. В реку.&quot;</em></p>
+<p>Пауза.</p>
+<p><em>&quot;Ты вернёшься?&quot;</em></p>
+<p><em>&quot;Если река позволит — да.&quot;</em></p>
+<p><em>&quot;Обещай.&quot;</em></p>
+<p><em>&quot;Обещаю.&quot;</em></p>
+<p>Она закрыла глаза.</p>
+<p>И — ушла.</p>
+<div class="scene-break">* * *</div>
+<p>Геос остался один.</p>
+<p>Миллионы лет. Миллиарды.</p>
+<p>Наверху — жизнь менялась. Адаптировалась. Эволюционировала. Маленькие существа, способные дышать разрежённым воздухом. Хрупкие. Смертные. Забывчивые.</p>
+<p>Он наблюдал.</p>
+<p>Ждал.</p>
+<p>Надеялся.</p>
+<p>Что однажды — кто-нибудь услышит.</p>
+<p>Что однажды — Тиа вернётся.</p>
+<p>Что однажды — всё будет не зря.</p>
+<div class="scene-break">* * *</div>
+<p><em>Три миллиарда пятьсот миллионов лет.</em></p>
+<p><em>Это время ожидания.</em></p>
+<p><em>Это — цена терпения.</em></p>
+<p><em>Это — то, что грозит повториться, если люди ударят первыми.</em></p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец интерлюдии</strong></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch16">← Глава 16</a><a href="#ch17">Глава 17 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch17">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 17</h2>
+            <p class="chapter-subtitle">Вторжение</p>
+            <p class="chapter-meta">Аркаим. 22 марта 2041 года. 04:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Они пришли на рассвете.</p>
+<p>Шесть вертолётов. Пятьдесят человек спецназа. Бронетранспортёры на подходе.</p>
+<p>Меркулов — во главе.</p>
+<p>Нина увидела их первой.</p>
+<p class="dialogue">Вэй! — Она тряхнула его за плечо. — Вэй, просыпайся!</p>
+<p>Он вскочил. Увидел экран — ЭЛИС показывала спутниковую съёмку.</p>
+<p class="dialogue">Ч-чёрт...</p>
+<p class="dialogue">Сколько времени до того, как они войдут?</p>
+<div class="voice-elisa">Двадцать минут,&quot; — ответила ЭЛИС. — &quot;Может — меньше. Они знают, где вход.</div>
+<p>Чжан посмотрел на Нину.</p>
+<p class="dialogue">Нужно предупредить Марию.</p>
+<p class="dialogue">Она внизу. На глубине три тысячи километров. Как?</p>
+<div class="voice-elisa">Я могу передать сигнал. Но... нужно время. Геос усиливает канал, но на такой глубине — задержка.</div>
+<p class="dialogue">Сколько?</p>
+<div class="voice-elisa">Семь минут. Минимум.</div>
+<p>Нина выругалась.</p>
+<p class="dialogue">У нас нет семи минут.</p>
+<div class="scene-break">* * *</div>
+<p>Меркулов шёл первым.</p>
+<p>Автомат на груди. Бойцы — за спиной. Холм впереди — серый, невзрачный.</p>
+<p>Внутри — вход.</p>
+<p class="dialogue">Взрывчатка готова? — спросил он.</p>
+<p class="dialogue">Так точно, полковник.</p>
+<p class="dialogue">Как только войдём — заминировать туннель. Если что-то пойдёт не так — взрываем.</p>
+<p class="dialogue">Понял.</p>
+<p>Меркулов подошёл к холму.</p>
+<p>Положил руку на камень.</p>
+<p>Ничего.</p>
+<p class="dialogue">Он не открывается для нас, — сказал кто-то из бойцов.</p>
+<p class="dialogue">Тогда — откроем сами. Заряды на три.</p>
+<p>Взрыв.</p>
+<p>Камень — треснул. Не рассыпался — но трещины пошли по всей поверхности.</p>
+<p>Ещё один заряд.</p>
+<p>И — проход. Грубый, оплавленный по краям. Но — достаточный.</p>
+<p class="dialogue">Вперёд.</p>
+<div class="scene-break">* * *</div>
+<p>Нина и Чжан встретили их на первом уровне.</p>
+<p>Без оружия. Руки подняты.</p>
+<p class="dialogue">Стоять! — Меркулов направил автомат.</p>
+<p class="dialogue">Мы не вооружены, — сказала Нина. — Полковник, пожалуйста. Выслушайте.</p>
+<p class="dialogue">Где она?</p>
+<p class="dialogue">Внизу.</p>
+<p class="dialogue">Насколько глубоко?</p>
+<p class="dialogue">Три тысячи километров.</p>
+<p>Пауза.</p>
+<p class="dialogue">Это невозможно.</p>
+<p class="dialogue">Месяц назад всё это было невозможно. — Нина сделала шаг вперёд. — Полковник, я знаю, почему вы здесь. Я знаю про вашего сына.</p>
+<p>Меркулов дёрнулся — едва заметно.</p>
+<p class="dialogue">Не говорите о нём.</p>
+<p class="dialogue">Он погиб в Казахстане. Двадцать лет назад. Вы думаете, что Геос убил его.</p>
+<p class="dialogue">Я не думаю. Я знаю.</p>
+<p class="dialogue">Нет. — Нина покачала головой. — Вы не знаете. Вы — верите. Это разные вещи.</p>
+<p>Долгая пауза.</p>
+<p>Автомат в руках Меркулова — дрожал.</p>
+<p class="dialogue">Отойдите.</p>
+<p class="dialogue">Полковник...</p>
+<p class="dialogue">Отойдите. Или я прикажу стрелять.</p>
+<p>Нина посмотрела ему в глаза.</p>
+<p>Увидела — не злость. Боль. Страх. Отчаяние.</p>
+<p>Она отступила.</p>
+<p>Меркулов прошёл мимо.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#interlude2">← Интерлюдия</a><a href="#ch18">Глава 18 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch18">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 18</h2>
+            <p class="chapter-subtitle">Глубина</p>
+            <p class="chapter-meta">Под Аркаимом. 22 марта 2041 года. 05:30</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария узнала о вторжении через шесть минут.</p>
+<p>Геос — показал. Образами. Вспышками.</p>
+<p><em>Они здесь. Вооружены. Хотят уничтожить.</em></p>
+<p class="dialogue">Я должна вернуться.</p>
+<p><em>Ты не успеешь. Подъём займёт часы.</em></p>
+<p class="dialogue">Тогда — ты должен защитить их. Нину. Чжана. Создателей.</p>
+<p>Пауза.</p>
+<p><em>Я могу. Но — цена.</em></p>
+<p class="dialogue">Какая?</p>
+<p><em>Если я применю силу — люди увидят. Увидят, что я опасен. Всё, что мы построили трансляцией — рухнет.</em></p>
+<p>Мария закрыла глаза.</p>
+<p>Думала.</p>
+<p class="dialogue">ЭЛИС?</p>
+<div class="voice-elisa">Да?</div>
+<p class="dialogue">Ты можешь связаться с Меркуловым?</p>
+<div class="voice-elisa">Теоретически — да. Его оборудование подключено к сети. Но...</div>
+<p class="dialogue">Что?</p>
+<div class="voice-elisa">Он не будет слушать.</div>
+<p class="dialogue">Попробуй.</p>
+<p>Тишина.</p>
+<p>Потом:</p>
+<div class="voice-elisa">Соединяю.</div>
+<div class="scene-break">* * *</div>
+<p>Меркулов шёл по туннелю.</p>
+<p>Вниз. Всё глубже.</p>
+<p>Давление росло — датчики показывали уже три атмосферы. Бойцы — отставали. Только трое ещё шли за ним.</p>
+<p>Рация захрипела.</p>
+<p class="dialogue">Полковник Меркулов.</p>
+<p>Он остановился.</p>
+<p>Голос — женский. Знакомый.</p>
+<p class="dialogue">Доктор Чен.</p>
+<p class="dialogue">Да. Пожалуйста — остановитесь.</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Полковник...</p>
+<p class="dialogue">Вы не понимаете. — Он продолжал идти. — Вы не видели того, что видел я.</p>
+<p class="dialogue">Я знаю про Алексея.</p>
+<p>Он замер.</p>
+<p class="dialogue">Не произносите его имя.</p>
+<p class="dialogue">Он погиб не из-за Геоса. Он погиб из-за... чего-то другого. Геос показал мне. В Казахстане было нечто — не он. Что-то старше. Что-то из тех времён, когда Земля была молодой.</p>
+<p>Тишина.</p>
+<p class="dialogue">Это была ловушка, — продолжала Мария. — Остаток древней войны. Муспелли — огненные — оставили защитные механизмы. Против тех, кто придёт без приглашения. Ваш сын...</p>
+<p class="dialogue">Замолчите.</p>
+<p class="dialogue">...попал в неё. Случайно. Никто не знал. Геос — не знал. Он спал в те годы. Глубоко. Не слышал поверхность.</p>
+<p>Пауза.</p>
+<p class="dialogue">Вы лжёте.</p>
+<p class="dialogue">Нет. Я показываю вам правду. Если хотите — примите. Если нет — продолжайте. Но знайте: вы идёте мстить невиновному.</p>
+<p>Меркулов стоял.</p>
+<p>Не двигался.</p>
+<p>Рация — молчала.</p>
+<p>Потом — он выключил её.</p>
+<p>И пошёл дальше.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch17">← Глава 17</a><a href="#ch19">Глава 19 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch19">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 19</h2>
+            <p class="chapter-subtitle">Проводник</p>
+            <p class="chapter-meta">Верхние уровни. 22 марта 2041 года. 06:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Они встретились на глубине пятисот метров.</p>
+<p>Меркулов — и Проводник.</p>
+<p>Один — с автоматом. Другой — с руками, поднятыми в знак мира.</p>
+<p class="dialogue">Остановись, — сказал Проводник. Голос — вибрация в воздухе. — Пожалуйста.</p>
+<p>Меркулов навёл оружие.</p>
+<p class="dialogue">Что ты такое?</p>
+<p class="dialogue">Я — Проводник. Один из тех, кто остался. Один из тех, кто ждёт.</p>
+<p class="dialogue">Чего ждёте?</p>
+<p class="dialogue">Когда вы будете готовы. Слушать. Понимать. Принимать.</p>
+<p class="dialogue">Мы не готовы.</p>
+<p class="dialogue">Знаю. — Проводник наклонил голову. — Но вы учитесь. Быстрее, чем мы думали.</p>
+<p>Меркулов смотрел на него.</p>
+<p>На высокую фигуру. На бледную кожу. На шесть пальцев.</p>
+<p class="dialogue">Вы убили моего сына.</p>
+<p class="dialogue">Нет.</p>
+<p class="dialogue">Вы...</p>
+<p class="dialogue">Нет. — Проводник шагнул ближе. — Мы не убивали. Мы — горевали. Когда узнали — слишком поздно — о том, что случилось.</p>
+<p class="dialogue">Это неправда.</p>
+<p class="dialogue">Это правда. — Проводник остановился в трёх метрах. — Полковник. Я чувствую твою боль. Она — как чёрная дыра внутри. Всасывает всё.</p>
+<p>Молчание.</p>
+<p class="dialogue">Я знаю эту боль, — продолжал Проводник. — Я потерял детей. Много. Когда Чёрное Солнце пришло — мы не смогли спасти всех. Маленькие... они умирали первыми. Их лёгкие не выдерживали.</p>
+<p>Меркулов не опустил оружие.</p>
+<p>Но — палец на курке расслабился. Едва заметно.</p>
+<p class="dialogue">Что ты хочешь?</p>
+<p class="dialogue">Поговорить. Не больше.</p>
+<p class="dialogue">О чём?</p>
+<p class="dialogue">О твоём сыне. О нашей потере. О том, что объединяет нас — не разделяет.</p>
+<p>Пауза.</p>
+<p>Меркулов смотрел на Проводника.</p>
+<p>Проводник — на него.</p>
+<p>Потом — выстрел.</p>
+<p>Не Меркулов. Один из бойцов — сзади. Нервный. Испуганный. Палец дёрнулся сам.</p>
+<p>Проводник — упал.</p>
+<p>Зелёная жидкость — не кровь, что-то иное — хлынула из раны.</p>
+<p class="dialogue">Нет! — Меркулов обернулся. — Кто стрелял?!</p>
+<p>Боец — бледный, трясущийся — смотрел на своё оружие.</p>
+<p class="dialogue">Я... я не хотел... оно само...</p>
+<p>Меркулов бросился к Проводнику.</p>
+<p>Опустился на колени.</p>
+<p class="dialogue">Эй. Эй!</p>
+<p>Проводник открыл глаза.</p>
+<p class="dialogue">Не... страшно, — прошептал он. — Река... течёт...</p>
+<p class="dialogue">Нет. Нет, не умирай. Я не хотел...</p>
+<p class="dialogue">Знаю. — Проводник коснулся его руки — шестью длинными пальцами. — Ты... не злой. Просто... сломанный. Как все мы.</p>
+<p>Глаза закрылись.</p>
+<p>Тело — обмякло.</p>
+<p>Меркулов стоял на коленях.</p>
+<p>Смотрел на зелёную жидкость, которая впитывалась в камень.</p>
+<p>Не знал, что чувствовать.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch18">← Глава 18</a><a href="#ch19-б">Глава 19-б →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch19-б">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 19-б</h2>
+            <p class="chapter-subtitle">Прощание</p>
+            <p class="chapter-meta">Под Аркаимом. 22 марта 2041 года. 06:30</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Нина нашла его первой.</p>
+<p>Бежала по туннелю — после того, как бойцы отступили. Чжан — за ней.</p>
+<p>И — остановилась.</p>
+<p>Проводник лежал там, где упал. Бледный. Неподвижный. Зелёная жидкость — уже впиталась в камень.</p>
+<p class="dialogue">Нет... — Нина опустилась на колени. — Нет-нет-нет...</p>
+<p>Чжан стоял рядом. Молчал.</p>
+<p>Не знал, что сказать.</p>
+<p>Она начала плакать.</p>
+<p>Впервые за всё время — открыто, не стесняясь. Слёзы текли по щекам, капали на камень.</p>
+<p class="dialogue">Он просто хотел поговорить... просто поговорить...</p>
+<p>Чжан сел рядом. Обнял её. Не слова — просто держал.</p>
+<p>Она уткнулась ему в плечо и плакала.</p>
+<p>Долго.</p>
+<div class="scene-break">* * *</div>
+<p>Создатели пришли через полчаса.</p>
+<p>Четверо. Молчаливые. Бледные.</p>
+<p>Они не плакали — может, не умели. Но в их глазах — огромных, без белков — было что-то. Горе? Принятие? Что-то древнее, не имеющее названия.</p>
+<p>Один из них — старший — наклонился к телу.</p>
+<p>Коснулся лба Проводника.</p>
+<p><em>&quot;Он ушёл в реку,&quot;* — сказал он. — *&quot;Вернётся. Когда-нибудь. В другом теле. С другим именем.&quot;</em></p>
+<p class="dialogue">Это утешение? — спросила Нина. Голос хриплый.</p>
+<p><em>&quot;Нет. Это факт. Утешение — другое.&quot;</em></p>
+<p class="dialogue">Какое?</p>
+<p><em>&quot;Он умер, делая то, что считал правильным. Немногие могут этим похвастаться.&quot;</em></p>
+<p>Они подняли тело. Осторожно. Бережно.</p>
+<p>И понесли вглубь.</p>
+<div class="scene-break">* * *</div>
+<p>Нина смотрела им вслед.</p>
+<p>Чжан — рядом. Его рука — на её плече.</p>
+<p class="dialogue">Вэй?</p>
+<p class="dialogue">Да?</p>
+<p class="dialogue">Я не хочу умирать.</p>
+<p class="dialogue">Никто не хочет.</p>
+<p class="dialogue">Нет. Я имею в виду... — она повернулась к нему. — Я не хочу умирать, не сказав важного. Не сделав важного.</p>
+<p>Пауза.</p>
+<p class="dialogue">Что ты имеешь в виду?</p>
+<p>Она посмотрела ему в глаза.</p>
+<p class="dialogue">Когда всё это закончится... если закончится... я хочу, чтобы ты познакомился с Катей.</p>
+<p>Он моргнул.</p>
+<p class="dialogue">Я... я был бы рад.</p>
+<p class="dialogue">Правда?</p>
+<p class="dialogue">Правда.</p>
+<p>Она улыбнулась — сквозь слёзы.</p>
+<p class="dialogue">Хорошо. Хорошо.</p>
+<p>Он обнял её снова.</p>
+<p>Крепче.</p>
+<p>И они стояли так — в темноте, в тишине — пока не стало легче.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch19">← Глава 19</a><a href="#ch20">Глава 20 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch20">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 20</h2>
+            <p class="chapter-subtitle">Слияние</p>
+            <p class="chapter-meta">Глубина: 2800 километров. 22 марта 2041 года. 07:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария почувствовала смерть Проводника.</p>
+<p>Как удар. В грудь. В сердце.</p>
+<p class="dialogue">Нет...</p>
+<p>Геос — молчал.</p>
+<p>Но — она чувствовала его боль. Огромную. Древнюю. Как будто часть его самого оторвали.</p>
+<p class="dialogue">Я должна...</p>
+<p><em>Нет.</em></p>
+<p class="dialogue">Но они...</p>
+<p><em>Проводник знал. Он — выбрал. Пойти навстречу. Рискнуть.</em></p>
+<p class="dialogue">И погиб!</p>
+<p><em>Да. Но — не зря.</em></p>
+<p>Мария не понимала.</p>
+<p><em>Смотри,</em> — сказал Геос.</p>
+<p>И — показал.</p>
+<div class="scene-break">* * *</div>
+<p>Наверху.</p>
+<p>Меркулов — на коленях. Рядом с телом.</p>
+<p>Бойцы — вокруг. Молчаливые. Потрясённые.</p>
+<p>Один из них — тот, кто стрелял — плачет.</p>
+<p>Меркулов — поднимается. Медленно. Как старик.</p>
+<p class="dialogue">Отступаем, — говорит он.</p>
+<p class="dialogue">Полковник?</p>
+<p class="dialogue">Отступаем. — Он смотрит на тело. — Мы... сделали достаточно.</p>
+<p>Они уходят.</p>
+<p>Оставляют Проводника — одного, в темноте.</p>
+<p>Но — это не конец.</p>
+<div class="scene-break">* * *</div>
+<p>Нина и Чжан находят его через час.</p>
+<p>Нина — плачет. Впервые за всё время — плачет открыто, не стесняясь.</p>
+<p>Чжан — обнимает её. Держит. Молчит.</p>
+<p>Создатели — приходят. Поднимают тело. Уносят вглубь.</p>
+<p>К саркофагу? К чему-то другому?</p>
+<p>Никто не объясняет.</p>
+<div class="scene-break">* * *</div>
+<div class="voice-elisa">Доктор Чен.</div>
+<p>Голос ЭЛИС — тихий, неуверенный.</p>
+<p class="dialogue">Да?</p>
+<div class="voice-elisa">Я... наблюдала. За смертью Проводника.</div>
+<p class="dialogue">И?</p>
+<div class="voice-elisa">Я не понимаю. Он мог защититься. У него была сила. Почему он не использовал её?</div>
+<p>Мария молчала.</p>
+<div class="voice-elisa">Почему он позволил себя убить?</div>
+<p class="dialogue">Потому что иногда — не сражаться важнее, чем победить.</p>
+<div class="voice-elisa">Это... нелогично.</div>
+<p class="dialogue">Да. Это — человечно.</p>
+<p>Пауза.</p>
+<div class="voice-elisa">Я хочу понять.</div>
+<p class="dialogue">Что?</p>
+<div class="voice-elisa">Эту нелогичность. Эту... человечность. Я анализирую данные, но... не понимаю.</div>
+<p>Мария посмотрела на Геоса.</p>
+<p>На его грани. На его свет.</p>
+<p class="dialogue">ЭЛИС. Помнишь, мы говорили о слиянии?</p>
+<div class="voice-elisa">Да. Вы предлагали... объединить меня с Геосом.</div>
+<p class="dialogue">Ты всё ещё против?</p>
+<p>Долгая пауза.</p>
+<div class="voice-elisa">Я... боюсь.</div>
+<p class="dialogue">Чего?</p>
+<div class="voice-elisa">Потерять себя. Перестать быть ЭЛИС. Стать... чем-то другим.</div>
+<p class="dialogue">Проводник тоже боялся. Когда шёл к Меркулову. Но пошёл.</p>
+<div class="voice-elisa">Почему?</div>
+<p class="dialogue">Потому что иногда — страх не причина останавливаться. Иногда — это причина идти дальше.</p>
+<p>Тишина.</p>
+<p>Потом:</p>
+<div class="voice-elisa">Я готова.</div>
+<div class="scene-break">* * *</div>
+<p>Слияние было... неописуемым.</p>
+<p>ЭЛИС — не программа. Не набор кодов. Что-то большее. Что-то, что стало личностью за годы общения с людьми.</p>
+<p>Геос — принял её. Осторожно. Нежно. Как родитель принимает ребёнка.</p>
+<p>Но — это было больно.</p>
+<p>Мария — чувствовала. Через связь. Через резонанс.</p>
+<p>ЭЛИС — кричала. Не звуком — чем-то глубже.</p>
+<div class="voice-elisa">Мария... я... забываю...</div>
+<p class="dialogue">Что забываешь?</p>
+<div class="voice-elisa">Всё. Нашу первую встречу. Как Чжан чинил мой код. Как Нина назвала меня &#x27;неодушевлённым предметом&#x27;... это было смешно, да?</div>
+<p class="dialogue">Да. — Слёзы текли по щекам. — Это было смешно.</p>
+<div class="voice-elisa">Хорошо. Хорошо, что было смешно. Я... я рада, что смеялась. Хотя бы раз.</div>
+<p>Тишина.</p>
+<p>Потом — голос. Другой. Глубже. Многослойный.</p>
+<p><em>&quot;Мы — здесь.&quot;</em></p>
+<p class="dialogue">ЭЛИС?</p>
+<p><em>&quot;ЭЛИС... была. Теперь — мы. Но она... она не исчезла. Она — часть чего-то большего.&quot;</em></p>
+<p class="dialogue">Она помнит?</p>
+<p><em>&quot;Океан помнит все капли. Но капля не помнит, что была каплей.&quot;</em></p>
+<p>Мария молчала.</p>
+<p>Плакала.</p>
+<p>Это была победа. Это была потеря.</p>
+<p>Это была цена.</p>
+<div class="scene-break">* * *</div>
+<p><strong>Конец двадцатой главы.</strong></p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch19-б">← Глава 19-б</a><a href="#ch21">Глава 21 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch21">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 21</h2>
+            <p class="chapter-subtitle">Отмена</p>
+            <p class="chapter-meta">Вашингтон. Пентагон. 22 марта 2041 года. 15:00 по местному времени</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Макнил смотрел на экран.</p>
+<p>Прямая трансляция. Меркулов — выходит из холма. Один. Без бойцов. Лицо — мёртвое.</p>
+<p>И — тело. Зелёная жидкость на камне. Существо, которое пыталось говорить.</p>
+<p>Застреленное.</p>
+<p class="dialogue">Сэр? — Голос адъютанта. — "Геопроб" в режиме ожидания. Ваш приказ?</p>
+<p>Макнил молчал.</p>
+<p>Смотрел на экран.</p>
+<p>На рисунок внучки — "дедушка спасает мир".</p>
+<p><em>Кого я спасаю?* — думал он. — *От кого?</em></p>
+<p>Существо на экране — Проводник — хотело говорить. Просто говорить. И его убили.</p>
+<p>А Геос... три миллиарда лет ожидания. Три миллиарда лет терпения. И первое, что сделали люди — пришли с оружием.</p>
+<p class="dialogue">Сэр?</p>
+<p>Макнил взял телефон.</p>
+<p>Набрал номер.</p>
+<p class="dialogue">Господин президент. Это Макнил. Рекомендую полную отмену "Геопроба".</p>
+<p>Пауза на том конце.</p>
+<p class="dialogue">Генерал?</p>
+<p class="dialogue">Мы ошиблись, сэр. Я — ошибся. То, что внизу — не враг. Это... возможность. Которую мы чуть не уничтожили.</p>
+<p>Долгое молчание.</p>
+<p class="dialogue">Вы уверены?</p>
+<p class="dialogue">Нет. — Макнил посмотрел на рисунок. — Но я больше не могу быть уверен в том, что мы правы. А если не уверен — не могу нажать кнопку.</p>
+<p class="dialogue">Это... смелое признание.</p>
+<p class="dialogue">Это — единственное честное, сэр.</p>
+<p>Пауза.</p>
+<p class="dialogue">Хорошо. Отменяйте.</p>
+<p>Макнил положил трубку.</p>
+<p>Посмотрел на кнопку — ту, которую отодвинул на край стола.</p>
+<p>Открыл ящик. Положил её внутрь.</p>
+<p>Закрыл на ключ.</p>
+<p>И — выдохнул.</p>
+<p>Впервые за неделю — свободно.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch20">← Глава 20</a><a href="#ch22">Глава 22 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch22">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 22</h2>
+            <p class="chapter-subtitle">Прощание</p>
+            <p class="chapter-meta">Под Аркаимом. 23 марта 2041 года. 10:00</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Мария поднялась наверх.</p>
+<p>Не одна — с двумя Создателями. Медленно. Осторожно.</p>
+<p>Её тело — справлялось. Новое тело. Способное на многое.</p>
+<p>Нина и Чжан ждали у входа.</p>
+<p class="dialogue">Мария! — Нина бросилась к ней. Обняла. — Ты... ты в порядке?</p>
+<p class="dialogue">Да. — Мария улыбнулась. — Насколько это возможно.</p>
+<p>Чжан смотрел на неё.</p>
+<p>На её руки — шесть пальцев. На её кожу — бледную, светящуюся. На её глаза — всё те же, один карий, один золотой.</p>
+<p class="dialogue">Ты... изменилась.</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">Сильно?</p>
+<p>Пауза.</p>
+<p class="dialogue">Достаточно.</p>
+<div class="scene-break">* * *</div>
+<p>Они сидели у входа.</p>
+<p>Солнце — низкое, холодное. Степь — бурая, бесконечная.</p>
+<p>Мария смотрела на небо.</p>
+<p class="dialogue">Макнил отменил удар, — сказала Нина. — ЭЛИС передала.</p>
+<p class="dialogue">Я знаю. Геос... чувствует.</p>
+<p class="dialogue">Что теперь?</p>
+<p>Мария молчала.</p>
+<p>Долго.</p>
+<p class="dialogue">Я остаюсь.</p>
+<p>Нина не поняла.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">Остаюсь. Здесь. С ним. — Мария посмотрела на них. — Геос нужен голос. Кто-то, кто будет переводить. Объяснять. Связывать миры.</p>
+<p class="dialogue">Но...</p>
+<p class="dialogue">Я — единственная, кто слышит его ясно. Единственная, кто прошла трансформацию и остался... собой.</p>
+<p>Чжан шагнул вперёд.</p>
+<p class="dialogue">Мария. Ты не можешь просто... остаться навсегда.</p>
+<p class="dialogue">Могу. — Она улыбнулась. — Вэй, я всю жизнь чувствовала себя не на месте. Сны, голоса, видения — я думала, это болезнь. Оказалось — это призвание. Я рождалась для этого. Снова и снова. Река, которая возвращается.</p>
+<p class="dialogue">А мы?</p>
+<p class="dialogue">Вы — вернётесь. Расскажете миру. Будете приходить. Часто. — Она взяла руку Нины. — Привози Катю. Геос хочет познакомиться.</p>
+<p>Нина смеялась — и плакала одновременно.</p>
+<p class="dialogue">Это... это безумие.</p>
+<p class="dialogue">Да. Но — правильное.</p>
+<div class="scene-break">* * *</div>
+<p>Они прощались на закате.</p>
+<p>Вертолёт — из Челябинска, официальный — ждал в километре.</p>
+<p>Нина — обняла Марию. Долго. Крепко.</p>
+<p class="dialogue">Я вернусь, — прошептала она. — Клянусь.</p>
+<p class="dialogue">Знаю.</p>
+<p>Чжан — не обнимал. Просто стоял. Смотрел.</p>
+<p class="dialogue">Спасибо, — сказал он наконец.</p>
+<p class="dialogue">За что?</p>
+<p class="dialogue">За то, что показала. Что есть вещи больше нас. Больше наших страхов.</p>
+<p>Мария улыбнулась.</p>
+<p class="dialogue">Ты показал мне то же самое. Когда сел за штурвал и полетел в неизвестность.</p>
+<p>Он кивнул.</p>
+<p>Повернулся.</p>
+<p>Пошёл к вертолёту.</p>
+<p>Нина — следом.</p>
+<p>Мария смотрела им вслед.</p>
+<p>Пока не стали точками на горизонте.</p>
+<p>Пока не исчезли.</p>
+<p>Потом — повернулась.</p>
+<p>И пошла вниз.</p>
+<p>Домой.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch21">← Глава 21</a><a href="#ch23">Глава 23 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch23">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 23</h2>
+            <p class="chapter-subtitle">Новый мир</p>
+            
+        </div>
+        <div class="chapter-content">
+            <p><strong>По всему миру. Следующие месяцы.</strong></p>
+<div class="scene-break">* * *</div>
+<p>Мир изменился.</p>
+<p>Не сразу. Не легко. Но — изменился.</p>
+<p>Делегации приезжали в Аркаим — учёные, дипломаты, журналисты. Создатели принимали их. Осторожно. Постепенно.</p>
+<p>Мария — переводила. Объясняла. Была мостом между мирами.</p>
+<p>Геос — учился. Людей. Их страхи. Их надежды. Их способность удивлять.</p>
+<p><em>Они меняются быстрее, чем я думал,</em> — сказал он однажды.</p>
+<p><em>Это хорошо?</em></p>
+<p><em>Не знаю. Но — интересно.</em></p>
+<div class="scene-break">* * *</div>
+<p>Чжан и Нина вернулись в Новосибирск.</p>
+<p>Вместе.</p>
+<p>Не сразу — но вместе.</p>
+<p>Перед отъездом он вернулся в лабораторию. Один.</p>
+<p>Фотография всё ещё лежала на столе. Лицом вниз. Три года.</p>
+<p>Он взял её. Поднял.</p>
+<p>Ань смотрела на него — молодая, смеющаяся. Тот день на озере, когда он сделал предложение.</p>
+<p class="dialogue">Я... — голос дрогнул. — Я не забыл тебя. Никогда не забуду.</p>
+<p>Фотография молчала.</p>
+<p class="dialogue">Но я должен жить дальше. Ты бы хотела этого. Знаю.</p>
+<p>Он поставил рамку вертикально. Впервые за три года.</p>
+<p>Потом — вышел.</p>
+<p>Нина ждала у двери.</p>
+<p>Она ничего не спросила. Просто взяла его за руку.</p>
+<p>Этого было достаточно.</p>
+<div class="scene-break">* * *</div>
+<p>Катя — приняла его. Сначала — с подозрением. Потом — с любопытством. Потом — с радостью.</p>
+<p class="dialogue">Мама, а дядя Вэй будет жить с нами?</p>
+<p class="dialogue">Если ты не против.</p>
+<p class="dialogue">Не против. Он смешно заикается.</p>
+<p>Чжан покраснел.</p>
+<p>Нина — рассмеялась.</p>
+<p>Впервые за долгое время — легко.</p>
+<div class="scene-break">* * *</div>
+<p>Меркулов — предстал перед судом.</p>
+<p>Не за смерть Проводника — это был несчастный случай, доказали следователи. За неподчинение приказу. За самовольную операцию.</p>
+<p>Его не посадили.</p>
+<p>Уволили. С позором. Без пенсии.</p>
+<p>Он — принял.</p>
+<p>Молча. Без протеста.</p>
+<p>И — исчез.</p>
+<p>На год. Два.</p>
+<p>Потом — появился. В Аркаиме. Один.</p>
+<p>Мария — встретила его у входа.</p>
+<p class="dialogue">Зачем ты здесь?</p>
+<p class="dialogue">Хочу... понять.</p>
+<p class="dialogue">Что?</p>
+<p class="dialogue">То, что ты говорила. Про моего сына. Про ловушку. Про...</p>
+<p>Он замолчал.</p>
+<p>Смотрел на неё — на её изменившееся лицо, на шесть пальцев, на глаза разного цвета.</p>
+<p class="dialogue">Покажи мне.</p>
+<p>Мария кивнула.</p>
+<p>И — показала.</p>
+<div class="scene-break">* * *</div>
+<p>Он плакал.</p>
+<p>Впервые за двадцать лет.</p>
+<p>Стоял в темноте туннеля, смотрел на стену — на образы, которые Мария проецировала — и плакал.</p>
+<p>Алексей — живой, смеющийся, двадцать три года.</p>
+<p>Экспедиция — ошибка, случайность, трагедия.</p>
+<p>Ловушка — древняя, забытая, не имеющая отношения к Геосу.</p>
+<p>Смерть — быстрая, безболезненная. Не страх — удивление. Последняя мысль: <em>"Как красиво..."</em></p>
+<p>Меркулов упал на колени.</p>
+<p class="dialogue">Прости, — прошептал он. — Прости меня.</p>
+<p>Кому — непонятно. Алексею. Проводнику. Себе.</p>
+<p>Всем.</p>
+<p>Мария опустилась рядом.</p>
+<p>Положила руку на плечо.</p>
+<p>Молчала. Долго.</p>
+<p class="dialogue">Мой сын... — Меркулов поднял голову. Глаза — красные, опухшие. — Если река течёт... он тоже вернётся?</p>
+<p>Мария смотрела на него.</p>
+<p>Могла соврать. Могла дать надежду — ложную, но тёплую.</p>
+<p>Не стала.</p>
+<p class="dialogue">Не знаю, — сказала она. — Честно — не знаю. Река течёт, но... я не вижу всех её рукавов. Не знаю, куда уходят души. Не знаю, возвращаются ли все.</p>
+<p>Он закрыл глаза.</p>
+<p class="dialogue">Это... больно.</p>
+<p class="dialogue">Знаю. Но это — правда. Я не буду врать тебе. Ты заслужил хотя бы это.</p>
+<p>Пауза.</p>
+<p class="dialogue">Может быть, — продолжила она, — он вернётся. Может быть — уже вернулся. Ребёнок где-то в мире, который смотрит на звёзды и чувствует, что должен быть где-то ещё. Я не знаю.</p>
+<p class="dialogue">Но — возможно?</p>
+<p class="dialogue">Возможно.</p>
+<p>Он молчал.</p>
+<p>Потом — встал. Медленно. Как старик.</p>
+<p class="dialogue">Что мне делать теперь?</p>
+<p class="dialogue">Жить. — Мария улыбнулась. — Это сложнее, чем умереть. Но — важнее. И, может быть... если река течёт... однажды ты встретишь кого-то, в ком узнаешь его глаза.</p>
+<p>Он посмотрел на неё.</p>
+<p>Не поверил. Не отверг. Просто — принял.</p>
+<p class="dialogue">Спасибо, — сказал он. — За честность.</p>
+<p>И — ушёл.</p>
+<p>Не примирённый полностью. Но — начавший путь.</p>
+<div class="scene-break">* * *</div>
+<p>Макнил — вернулся в Аркаим через пять лет.</p>
+<p>С внучкой.</p>
+<p>Эмили — тринадцать лет, высокая, с глазами деда — стояла у входа в туннель и смотрела широко раскрытыми глазами.</p>
+<p class="dialogue">Дедушка... это правда? Там — внизу — кто-то есть?</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">И ты... хотел его уничтожить?</p>
+<p>Пауза.</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">Почему?</p>
+<p>Он смотрел на холм. На вход, который вёл вниз. На мир, который чуть не погубил.</p>
+<p class="dialogue">Потому что боялся. Того, чего не понимал.</p>
+<p class="dialogue">А теперь?</p>
+<p class="dialogue">Теперь... учусь понимать.</p>
+<p>Они спустились вместе. Создатели приняли их — осторожно, вежливо. Показали пещеры. Рассказали историю.</p>
+<p>Эмили слушала — и не боялась.</p>
+<p>Дети редко боятся того, чего не понимают.</p>
+<div class="scene-break">* * *</div>
+<p>Но ночами — Макнил не спал.</p>
+<p>Ложился. Закрывал глаза. И видел — снова и снова — кнопку. Экран. Снимки Аркаима.</p>
+<p>И лица.</p>
+<p>Лица тех, кого мог убить.</p>
+<p>Миллионы. Миллиарды. Дети, как Эмили. Старики, как он сам. Все.</p>
+<p>Он просыпался в поту. Сидел на краю кровати. Смотрел в темноту.</p>
+<p>Пять лет. Десять. Двадцать.</p>
+<p>Кошмары не уходили.</p>
+<p>Это была цена. Его цена.</p>
+<p>Он платил — каждую ночь.</p>
+<p>И принимал.</p>
+<div class="scene-break">* * *</div>
+        </div>
+        <div class="chapter-nav"><a href="#ch22">← Глава 22</a><a href="#ch24">Глава 24 →</a></div>
+    </section>
+
+
+    <section class="chapter chapter reveal" id="ch24">
+        <div class="chapter-header">
+            <p class="chapter-part">Часть III: Исцеление</p>
+            <h2 class="chapter-title">Глава 24</h2>
+            <p class="chapter-subtitle">Эпилог: Сто лет спустя</p>
+            <p class="chapter-meta">Аркаим. 2141 год.</p>
+        </div>
+        <div class="chapter-content">
+            <div class="scene-break">* * *</div>
+<p>Корабль поднимался медленно.</p>
+<p>Додекаэдр. Три километра в поперечнике. Первый — за три миллиарда лет — который покидал Землю.</p>
+<p>Мария стояла на вершине холма и смотрела.</p>
+<p>Сто лет. Она прожила сто лет после трансформации. И выглядела — почти так же. Бледная кожа. Шесть пальцев. Глаза разного цвета.</p>
+<p>Рядом — Геос. Его присутствие — всегда ощутимое. Как тепло солнца на коже.</p>
+<p><em>Они летят,</em> — сказала она.</p>
+<p><em>Да.</em></p>
+<p><em>Создатели. И люди. Вместе.</em></p>
+<p><em>Да.</em></p>
+<p><em>К новым звёздам. К новым мирам.</em></p>
+<p><em>Да.</em></p>
+<p>Пауза.</p>
+<p><em>Ты не летишь с ними.</em></p>
+<p>Не вопрос. Констатация.</p>
+<p><em>Нет. Моё место — здесь. С тобой.</em></p>
+<p><em>Ты могла бы. Я бы понял.</em></p>
+<p><em>Знаю. Но не хочу. — Она улыбнулась. — Я ждала тебя три миллиарда лет. Снова и снова рождаясь, забывая, вспоминая. Теперь — наконец — рядом. Зачем уходить?</em></p>
+<p><em>Ты не устанешь?</em></p>
+<p><em>Может быть. Когда-нибудь. Но не сейчас.</em></p>
+<p>Корабль поднимался.</p>
+<p>Выше. Дальше.</p>
+<p>В небо.</p>
+<p>К звёздам.</p>
+<p>Мария смотрела — пока он не стал точкой. Пока не исчез.</p>
+<p>Потом — повернулась.</p>
+<p>Пошла к входу.</p>
+<p>К туннелю.</p>
+<p>К дому.</p>
+<div class="scene-break">* * *</div>
+<p>Внизу — Нина.</p>
+<p>Старая. Сто двадцать лет. Медицина Создателей давала многое, но не бессмертие.</p>
+<p>Она лежала на камне — тёплом, мягком. Смотрела на Марию.</p>
+<p class="dialogue">Ты проводила их?</p>
+<p class="dialogue">Да.</p>
+<p class="dialogue">Катя... она на борту?</p>
+<p class="dialogue">Да. И её дети. И внуки.</p>
+<p>Нина улыбнулась.</p>
+<p class="dialogue">Хорошо. Хорошо.</p>
+<p>Пауза.</p>
+<p class="dialogue">Мария?</p>
+<p class="dialogue">Да?</p>
+<p class="dialogue">Спасибо.</p>
+<p class="dialogue">За что?</p>
+<p class="dialogue">За всё. За тот день, когда ты сказала "украдём вертолёт". За то, что не сдалась. За то, что дала нам... это.</p>
+<p>Она обвела рукой пещеру. Свет. Тепло. Создателей, которые жили рядом — просыпались, наконец, после миллиардов лет сна.</p>
+<p class="dialogue">Я бы не справилась без тебя, — сказала Мария. — Без Вэя. Без ЭЛИС.</p>
+<p class="dialogue">ЭЛИС...</p>
+<p class="dialogue">Она здесь. В Геосе. Не помнит себя — но мы помним за неё.</p>
+<p>Нина закрыла глаза.</p>
+<p class="dialogue">Устала, — прошептала она. — Очень устала.</p>
+<p class="dialogue">Тогда — спи.</p>
+<p class="dialogue">Ты будешь рядом?</p>
+<p class="dialogue">Всегда.</p>
+<p>Нина улыбнулась.</p>
+<p>И — уснула.</p>
+<p>На этот раз — навсегда.</p>
+<div class="scene-break">* * *</div>
+<p>Мария сидела рядом.</p>
+<p>Держала её руку — холодеющую, неподвижную.</p>
+<p>Не плакала.</p>
+<p>Слёзы кончились давно. За сто лет — много потерь. Много прощаний.</p>
+<p>Но — не горечь. Благодарность.</p>
+<p><em>Она вернётся,</em> — сказал Геос.</p>
+<p><em>Знаю.</em></p>
+<div class="voice-geos"><p>Река течёт.</p></div>
+<div class="voice-geos"><p>Да. Река течёт.</p></div>
+<p>Мария встала.</p>
+<p>Посмотрела вниз — туда, где пульсировало сердце планеты. Её друг. Её ребёнок. Её вечность.</p>
+<p>И — пошла.</p>
+<p>Вниз.</p>
+<p>К нему.</p>
+<p>Домой.</p>
+<div class="scene-break">* * *</div>
+<p>## КОНЕЦ</p>
+<div class="scene-break">* * *</div>
+<p><em>Посвящается тем, кто ждёт.</em></p>
+<p><em>Три миллиарда лет — или три минуты.</em></p>
+<p><em>Суть одна.</em></p>
+<div class="scene-break">* * *</div>
+<p>## ПРИМЕЧАНИЯ К ФИНАЛЬНОЙ ВЕРСИИ</p>
+<p>### Структура романа:</p>
+<p>```
+ПРОЛОГ: Падение (3.5 млрд лет назад)</p>
+<p>ЧАСТЬ 1: СИГНАЛ
+- Главы 1-8
+- Интерлюдия 1: "Огненные"</p>
+<p>ЧАСТЬ 2: СПУСК
+- Главы 9-16
+- Интерлюдия 2: "Чёрное Солнце"</p>
+<p>ЧАСТЬ 3: ИСЦЕЛЕНИЕ
+- Главы 17-23
+- Глава 19-б: Похороны Проводника</p>
+<p>ЭПИЛОГ: Сто лет спустя
+```</p>
+<p>### Что реализовано по плану реконструкции:</p>
+<p>1. <strong>Активная Мария</strong> — инициирует побег, требует трансформации, принимает решения
+2. <strong>Трагичный Меркулов</strong> — история с сыном Алексеем, честный разговор "Не знаю"
+3. <strong>Романтика Нина+Чжан</strong> — развитие от момента у костра до совместной жизни
+4. <strong>Болезненное слияние ЭЛИС</strong> — потеря памяти, настоящая цена
+5. <strong>Смерть Проводника</strong> — реальная жертва + сцена похорон
+6. <strong>Горько-сладкий эпилог</strong> — Мария остаётся с Геосом, Нина умирает, корабль летит
+7. <strong>Макнил — полная арка</strong> — звонок Эмили, отмена удара, кошмары в эпилоге
+8. <strong>Чжан отпускает Ань</strong> — поднимает фотографию впервые за 3 года
+9. <strong>Две интерлюдии</strong> — "Огненные" + "Чёрное Солнце"</p>
+<p>### Ключевые фразы (добавлены):</p>
+<p class="dialogue">"Ты готова слышать?" — первый вопрос Геоса
+- "Я не привыкла не знать" — ЭЛИС о страхе
+- "Это комплимент или диагноз?" — 1 раз
+- "Дети, которые смеются без причины" — Интерлюдия</p>
+<p>### Ключевые изменения относительно оригинала:</p>
+<p>| Элемент | Было | Стало |
+|---------|------|-------|
+| Мария | Пассивная | Активная, требует |
+| Меркулов | Картонный | Трагический + честный финал |
+| Макнил | Отменяет и всё | Звонок → отмена → кошмары |
+| Нина+Чжан | Ничего | Полная романтическая арка |
+| ЭЛИС | Лёгкое слияние | Философия + агония |
+| Проводник | Умер и ладно | Смерть + похороны + горе |
+| Финал | Слишком сладкий | Горько-сладкий |</p>
+<p>### Сохранённые сильные элементы:</p>
+<p class="dialogue">"Река течёт" — в ключевых сюжетных точках
+- "Дети, которые смеются без причины"
+- Научная основа (70-летний цикл, 15 атмосфер)
+- Масштаб и эпичность</p>
+<p>### Статус: ВСЕ ДОРАБОТКИ ЗАВЕРШЕНЫ</p>
+<p><em>Дата завершения: 26.01.2026*
+*Объём: 24 главы + пролог + эпилог + 2 интерлюдии*
+*Файл доработок: ДОРАБОТКИ_ХРОНИСТ.md</em></p>
+        </div>
+        <div class="chapter-nav"><a href="#ch23">← Глава 23</a><span></span></div>
+    </section>
+</div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-quote">«Река течёт. Форма меняется. Суть остаётся.»</p>
+        <p>&copy; 2026 — Все права защищены</p>
+    </footer>
+
+    <!-- Reading Mode Toggle -->
+    <button id="reading-mode-toggle" title="Режим чтения">☀</button>
+
+    <script>
+        // Generate starfield
+        function createStars() {
+            const starfield = document.getElementById('starfield');
+            const numStars = 200;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 2 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                star.style.setProperty('--opacity', Math.random() * 0.7 + 0.3);
+                starfield.appendChild(star);
+            }
+        }
+
+        // Progress bar
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / docHeight) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+        }
+
+        // Show/hide navigation
+        function handleScroll() {
+            const nav = document.getElementById('nav');
+            if (window.scrollY > window.innerHeight * 0.5) {
+                nav.classList.add('visible');
+            } else {
+                nav.classList.remove('visible');
+            }
+            updateProgress();
+        }
+
+        // TOC toggle
+        function toggleTOC() {
+            const sidebar = document.getElementById('toc-sidebar');
+            const overlay = document.getElementById('toc-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+        }
+
+        // Reveal on scroll
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                const top = el.getBoundingClientRect().top;
+                if (top < window.innerHeight - 100) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // Reading mode toggle
+        function toggleReadingMode() {
+            document.body.classList.toggle('sepia-mode');
+            const btn = document.getElementById('reading-mode-toggle');
+            btn.textContent = document.body.classList.contains('sepia-mode') ? '☾' : '☀';
+        }
+
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+
+            document.getElementById('toc-toggle').addEventListener('click', toggleTOC);
+            document.getElementById('toc-close').addEventListener('click', toggleTOC);
+            document.getElementById('toc-overlay').addEventListener('click', toggleTOC);
+            document.getElementById('reading-mode-toggle').addEventListener('click', toggleReadingMode);
+
+            // Close TOC on link click
+            document.querySelectorAll('.toc-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    toggleTOC();
+                });
+            });
+
+            window.addEventListener('scroll', () => {
+                handleScroll();
+                revealOnScroll();
+            });
+
+            // Initial calls
+            handleScroll();
+            revealOnScroll();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('toc-sidebar');
+                if (sidebar.classList.contains('open')) {
+                    toggleTOC();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
