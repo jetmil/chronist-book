@@ -784,6 +784,41 @@
         body.sepia-mode .voice-elisa {
             background: rgba(0, 150, 180, 0.1);
         }
+
+        /* CHAPTER IMAGES */
+        .chapter-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.2);
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.8s ease;
+        }
+
+        .chapter-image.loaded {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hero-cover {
+            max-width: 400px;
+            margin: 2rem auto;
+            border-radius: 16px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .chapter-image {
+                border-radius: 8px;
+            }
+            .hero-cover {
+                max-width: 280px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -869,6 +904,9 @@
         <h1 class="hero-title">ХРОНИСТ</h1>
         <p class="hero-subtitle">Даровицкий</p>
         <p class="hero-tagline-small" style="font-family: 'Montserrat', sans-serif; font-size: 0.8rem; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 1rem;">Три миллиарда лет ожидания</p>
+        
+        <img src="images/cover.png" alt="ХРОНИСТ - Обложка" class="hero-cover chapter-image" onload="this.classList.add('loaded')">
+
         <p class="hero-tagline">«Я буду помнить. Всегда. Каждого. Всё.»</p>
         <div class="scroll-indicator">
             <span>Читать</span>
@@ -887,6 +925,7 @@
             <p class="chapter-subtitle">ПАДЕНИЕ</p>
             <p class="chapter-meta">3.5 миллиарда лет назад</p>
         </div>
+        <img src="images/prologue.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Дерево падало семнадцать часов.</p>
@@ -946,6 +985,7 @@
             <p class="chapter-subtitle">Сон</p>
             <p class="chapter-meta">Москва. 17 марта 2041 года. 03:47</p>
         </div>
+        <img src="images/ch1.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария проснулась с криком.</p>
@@ -1006,6 +1046,7 @@
             <p class="chapter-subtitle">Аномалия</p>
             <p class="chapter-meta">Новосибирск. 17 марта 2041 года. Тем же утром.</p>
         </div>
+        <img src="images/ch2.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Вэй Чжан не спал уже тридцать часов.</p>
@@ -1098,6 +1139,7 @@
             <p class="chapter-subtitle">Сбор</p>
             <p class="chapter-meta">Москва. 19 марта 2041 года. Бункер "Кристалл".</p>
         </div>
+        <img src="images/ch3.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария прибыла последней.</p>
@@ -1176,6 +1218,7 @@
             <p class="chapter-subtitle">Выбор</p>
             <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 02:30</p>
         </div>
+        <img src="images/ch4.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария не спала.</p>
@@ -1308,6 +1351,7 @@
             <p class="chapter-subtitle">Побег</p>
             <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 04:00</p>
         </div>
+        <img src="images/ch5.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Охрана — двое у лифта, двое у ангара.</p>
@@ -1384,6 +1428,7 @@
             <p class="chapter-subtitle">Погоня</p>
             <p class="chapter-meta">Над Россией. 20 марта 2041 года. 05:30</p>
         </div>
+        <img src="images/ch6.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Рассвет догнал их над Казанью.</p>
@@ -1533,6 +1578,7 @@
             <p class="chapter-subtitle">Аркаим</p>
             <p class="chapter-meta">Челябинская область. 20 марта 2041 года. 08:15</p>
         </div>
+        <img src="images/ch7.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Они сели в километре от раскопа.</p>
@@ -1609,6 +1655,7 @@
             <p class="chapter-subtitle">Создатели</p>
             
         </div>
+        <img src="images/ch8.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Их было пятеро.</p>
@@ -1734,6 +1781,7 @@
             <p class="chapter-subtitle">ОГНЕННЫЕ</p>
             
         </div>
+        <img src="images/interlude1.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <p><em>800 миллионов лет назад</em></p>
 <div class="scene-break">* * *</div>
@@ -1837,6 +1885,7 @@
             <p class="chapter-subtitle">Трансформация</p>
             
         </div>
+        <img src="images/ch9.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Камера трансформации была похожа на саркофаг.</p>
@@ -1981,6 +2030,7 @@
             <p class="chapter-subtitle">Меркулов</p>
             <p class="chapter-meta">Москва. Бункер "Кристалл". 20 марта 2041 года. 09:00</p>
         </div>
+        <img src="images/ch10.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Меркулов узнал о побеге в восемь утра.</p>
@@ -2055,6 +2105,7 @@
             <p class="chapter-subtitle">Спуск</p>
             <p class="chapter-meta">Под Аркаимом. 20 марта 2041 года. 14:00</p>
         </div>
+        <img src="images/ch11.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Они спускались уже шесть часов.</p>
@@ -2138,6 +2189,7 @@
             <p class="chapter-subtitle">Пентагон</p>
             <p class="chapter-meta">Вашингтон. Пентагон. 20 марта 2041 года. 08:00 по местному времени</p>
         </div>
+        <img src="images/ch12.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Генерал Макнил смотрел на экран.</p>
@@ -2229,6 +2281,7 @@
             <p class="chapter-subtitle">Сердце</p>
             <p class="chapter-meta">Глубина: 2800 километров. 20 марта 2041 года. 23:00</p>
         </div>
+        <img src="images/ch13.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Она почувствовала его раньше, чем увидела.</p>
@@ -2330,6 +2383,7 @@
             <p class="chapter-subtitle">Ночь</p>
             <p class="chapter-meta">Под Аркаимом. Верхний уровень. 21 марта 2041 года. 02:00</p>
         </div>
+        <img src="images/ch14.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Нина не могла уснуть.</p>
@@ -2386,6 +2440,7 @@
             <p class="chapter-subtitle">Трансляция</p>
             <p class="chapter-meta">Глубина: 2800 километров. 21 марта 2041 года. 06:00</p>
         </div>
+        <img src="images/ch15.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p class="dialogue">ЭЛИС, ты меня слышишь?</p>
@@ -2449,6 +2504,7 @@
             <p class="chapter-subtitle">Реакция</p>
             <p class="chapter-meta">По всему миру. 21 марта 2041 года. После трансляции.</p>
         </div>
+        <img src="images/ch16.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p><strong>Москва. Кремль.</strong></p>
@@ -2531,6 +2587,7 @@
             <p class="chapter-subtitle">ЧЁРНОЕ СОЛНЦЕ</p>
             
         </div>
+        <img src="images/interlude2.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <p><em>3.5 миллиарда лет назад. День катастрофы.</em></p>
 <div class="scene-break">* * *</div>
@@ -2653,6 +2710,7 @@
             <p class="chapter-subtitle">Вторжение</p>
             <p class="chapter-meta">Аркаим. 22 марта 2041 года. 04:00</p>
         </div>
+        <img src="images/ch17.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Они пришли на рассвете.</p>
@@ -2729,6 +2787,7 @@
             <p class="chapter-subtitle">Глубина</p>
             <p class="chapter-meta">Под Аркаимом. 22 марта 2041 года. 05:30</p>
         </div>
+        <img src="images/ch18.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария узнала о вторжении через шесть минут.</p>
@@ -2795,6 +2854,7 @@
             <p class="chapter-subtitle">Проводник</p>
             <p class="chapter-meta">Верхние уровни. 22 марта 2041 года. 06:00</p>
         </div>
+        <img src="images/ch19.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Они встретились на глубине пятисот метров.</p>
@@ -2921,6 +2981,7 @@
             <p class="chapter-subtitle">Слияние</p>
             <p class="chapter-meta">Глубина: 2800 километров. 22 марта 2041 года. 07:00</p>
         </div>
+        <img src="images/ch20.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария почувствовала смерть Проводника.</p>
@@ -3025,6 +3086,7 @@
             <p class="chapter-subtitle">Отмена</p>
             <p class="chapter-meta">Вашингтон. Пентагон. 22 марта 2041 года. 15:00 по местному времени</p>
         </div>
+        <img src="images/ch21.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Макнил смотрел на экран.</p>
@@ -3071,6 +3133,7 @@
             <p class="chapter-subtitle">Прощание</p>
             <p class="chapter-meta">Под Аркаимом. 23 марта 2041 года. 10:00</p>
         </div>
+        <img src="images/ch22.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <div class="scene-break">* * *</div>
 <p>Мария поднялась наверх.</p>
@@ -3144,6 +3207,7 @@
             <p class="chapter-subtitle">Новый мир</p>
             
         </div>
+        <img src="images/ch23.png" alt="Иллюстрация к главе" class="chapter-image" onload="this.classList.add('loaded')" loading="lazy">
         <div class="chapter-content">
             <p><strong>По всему миру. Следующие месяцы.</strong></p>
 <div class="scene-break">* * *</div>
